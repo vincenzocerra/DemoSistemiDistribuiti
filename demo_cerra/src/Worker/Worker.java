@@ -2,7 +2,17 @@ package Worker;
 
 import java.rmi.RemoteException;
 
-public class Worker implements WorkerStub{
+public class Worker extends java.rmi.server.UnicastRemoteObject implements WorkerStub{
+
+	protected Worker() throws RemoteException {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@Override
 	public String doTask(String command) throws RemoteException {
