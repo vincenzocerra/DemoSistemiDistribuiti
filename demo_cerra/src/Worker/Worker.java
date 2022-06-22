@@ -20,17 +20,4 @@ public class Worker extends UnicastRemoteObject implements WorkerStub{
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	@Override
-	public boolean saveFile(byte[] file, String filename) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public byte[] readFile(String filename) throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
