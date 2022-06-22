@@ -1,8 +1,9 @@
 package Worker;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 
-public class Worker extends java.rmi.server.UnicastRemoteObject implements WorkerStub{
+public class Worker extends UnicastRemoteObject implements WorkerStub{
 
 	protected Worker() throws RemoteException {
 		super();
