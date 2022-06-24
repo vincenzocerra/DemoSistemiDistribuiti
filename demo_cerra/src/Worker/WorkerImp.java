@@ -29,7 +29,8 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 		try {
 			Registry registry = LocateRegistry.getRegistry(host, port);
 			master = (MasterServer) registry.lookup("master");
-			
+			master.addWorker(this);
+
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -48,6 +49,7 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 			try {
 				line = bReader.readLine();
 				if(line.equals("q") && line != null) {
+					master.removeWorker(this);
 					running = false;
 					bReader.close();
 					System.out.println("Worker disconnesso!");
