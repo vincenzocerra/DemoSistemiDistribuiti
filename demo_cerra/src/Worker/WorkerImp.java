@@ -1,19 +1,38 @@
 package Worker;
 
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-public class Worker extends UnicastRemoteObject implements WorkerStub{
+import Master.MasterServer;
 
-	protected Worker() throws RemoteException {
+public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
+	
+	private static final long serialVersionUID = 1L;
+	/**
+	 * default generated serialVersionUID
+	 */
+	
+	private MasterServer master;
+	private boolean running = true;
+
+	protected WorkerImp(String host, int port) throws RemoteException, NotBoundException {
 		super();
-		// TODO Auto-generated constructor stub
+		
+		System.out.println("Worker: Sta cercando di connettersi al server: " + host + " port: " + port);
+		
+		try {
+			Registry registry = LocateRegistry.getRegistry(host, port);
+			master = (MasterServer) registry.lookup("master");
+			
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 
 	@Override
 	public String doTask(String command) throws RemoteException {
