@@ -21,7 +21,7 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 	private MasterServer master;
 	private boolean running = true;
 
-	protected WorkerImp(String host, int port) throws RemoteException, NotBoundException {
+	public WorkerImp(String host, int port) throws RemoteException, NotBoundException {
 		super();
 		
 		System.out.println("Worker: Sta cercando di connettersi al server: " + host + " port: " + port);

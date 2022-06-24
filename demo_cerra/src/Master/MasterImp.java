@@ -20,7 +20,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	private String lineString;
 
 
-	protected MasterImp(int port) throws RemoteException {
+	public MasterImp(int port) throws RemoteException {
 		super();
 		System.out.println("Master avviato con successo");
 		
