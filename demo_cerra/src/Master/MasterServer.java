@@ -9,7 +9,7 @@ public interface MasterServer extends Remote{
 	
 	String submitJob() throws RemoteException;
 	
-	public void addWorker(WorkerServer w) throws RemoteException;
+	public void connectWorker(WorkerServer w) throws RemoteException;
 	
-	public void removeWorker(WorkerServer w) throws RemoteException;
+	public void disconnectWorker(WorkerServer w) throws RemoteException;
 }

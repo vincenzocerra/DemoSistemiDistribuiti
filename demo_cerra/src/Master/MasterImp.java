@@ -86,16 +86,16 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	}
 	
 	@Override
-	public void addWorker(WorkerServer w) throws RemoteException {
+	public void connectWorker(WorkerServer w) throws RemoteException {
 		workers.add(w);
-		System.out.println("Server: Worker" + w + " registrato!");
+		System.out.println("Server: Worker" + w + " connesso!");
 		System.out.println("Server: Attualmente sono disponibili: " + workers.size()+ " Worker");
 	}
 
 	@Override
-	public void removeWorker(WorkerServer w) throws RemoteException {
+	public void disconnectWorker(WorkerServer w) throws RemoteException {
 		workers.remove(w);
-		System.out.println("Server: Worker" + w + " rimosso!");
+		System.out.println("Server: Worker" + w + " Disconnesso!");
 		System.out.println("Server: Attualmente sono disponibili: " + workers.size()+ " Worker");
 	}
 	
