@@ -84,5 +84,21 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public void addWorker(WorkerServer w) throws RemoteException {
+		workers.add(w);
+		System.out.println("Server: Worker" + w + " registrato!");
+		System.out.println("Server: Attualmente sono disponibili: " + workers.size()+ " Worker");
+	}
+
+	@Override
+	public void removeWorker(WorkerServer w) throws RemoteException {
+		workers.remove(w);
+		System.out.println("Server: Worker" + w + " rimosso!");
+		System.out.println("Server: Attualmente sono disponibili: " + workers.size()+ " Worker");
+	}
+	
+	
 
 }
