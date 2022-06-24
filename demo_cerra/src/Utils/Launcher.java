@@ -3,6 +3,7 @@ package Utils;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
+import Client.ClientTest;
 import Master.MasterImp;
 import Worker.WorkerImp;
 
@@ -12,11 +13,13 @@ public class Launcher {
 
     public static void main(String[] args) {
         try {
-            if (args[0].equals("Server")) {
+            if (args[0].equals("Master")) {
                 new MasterImp(Integer.parseInt(args[1]));
                 } 
             else if (args[0].equals("Worker")){
                 new WorkerImp(localHost, Integer.parseInt(args[1])).startConsole();
+            }else if (args[0].equals("Client")) {
+            	new ClientTest(localHost, Integer.parseInt(args[1])).execute();
             } else {
             	System.err.println("Digita \"Server\" o \"Worker\" seguiti dalla porta!");
             }
