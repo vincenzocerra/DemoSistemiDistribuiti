@@ -3,11 +3,12 @@ package Master;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import Client.Job;
 import Worker.WorkerServer;
 
 public interface MasterServer extends Remote{
 	
-	String submitJob() throws RemoteException;
+	public Object execute(Job j, Object parameters) throws RemoteException;
 	
 	public void connectWorker(WorkerServer w) throws RemoteException;
 	

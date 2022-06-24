@@ -3,8 +3,10 @@ package Worker;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import Client.Job;
+
 //Interfaccia per i Worker
 
 public interface WorkerServer extends Remote {
-    String doTask(String command) throws RemoteException;
+    Object start(Job j, Object parameters) throws RemoteException;
 }

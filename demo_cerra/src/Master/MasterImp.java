@@ -11,6 +11,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
+import Client.Job;
 import Worker.WorkerServer;
 
 public class MasterImp extends UnicastRemoteObject implements MasterServer{
@@ -79,9 +80,14 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@Override
-	public String submitJob() throws RemoteException {
-		// TODO Auto-generated method stub
+	public Object execute(Job j, Object parameters) throws RemoteException {
+		//devo controllare se ci sono worker liberi
+		
+		for(WorkerServer w: workers) {
+			System.out.println("Work distributed!");
+			return w.start( j, parameters);
+		}
+		
 		return null;
 	}
 	
@@ -98,6 +104,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		System.out.println("Server: Worker" + w + " Disconnesso!");
 		System.out.println("Server: Attualmente sono disponibili: " + workers.size()+ " Worker");
 	}
+
 	
 	
 

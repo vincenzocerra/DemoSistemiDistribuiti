@@ -9,6 +9,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
+import Client.Job;
 import Master.MasterServer;
 
 public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
@@ -64,8 +65,7 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 
 
 	@Override
-	public String doTask(String command) throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+	public Object start(Job j, Object parameters) throws RemoteException {
+		return j.run(parameters);
 	}
 }
