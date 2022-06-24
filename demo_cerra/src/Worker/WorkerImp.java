@@ -1,5 +1,8 @@
 package Worker;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -31,6 +34,30 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public void startConsole() {
+		String line;
+		
+		System.out.println("Connessione avvenuta con Successo");
+		System.out.println("CONSOLE");
+		System.out.println("Digita  \"q\" per disconnetterti");
+		BufferedReader bReader = new BufferedReader(new InputStreamReader(System.in));
+		
+		while(running) {
+			try {
+				line = bReader.readLine();
+				if(line.equals("q") && line != null) {
+					running = false;
+					bReader.close();
+					System.out.println("Worker disconnesso!");
+				}
+			} catch (IOException e) {
+				// TODO: handle exception
+				e.printStackTrace();
+			}
+		}
+		System.exit(-1);
 	}
 
 
