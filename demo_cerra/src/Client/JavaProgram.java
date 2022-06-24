@@ -7,7 +7,7 @@ public class JavaProgram implements Job {
 	
 	public Object run(Object parameters) {
 		
-		return new Integer(99);
+		return (99);
 	}
 
 	@Override
