@@ -66,7 +66,9 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 
 	@Override
 	public Object start(Job j, Object parameters) throws RemoteException {
+		
 		System.out.println("Worker: Sto procedendo ad eseguire l'applicazione");
+		
 		return j.run(parameters);
 	}
 }

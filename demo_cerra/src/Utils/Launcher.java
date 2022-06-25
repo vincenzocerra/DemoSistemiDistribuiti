@@ -19,7 +19,7 @@ public class Launcher {
             else if (args[0].equals("Worker")){
                 new WorkerImp(localHost, Integer.parseInt(args[1])).startConsole();
             }else if (args[0].equals("Client")) {
-            	new ClientTest(localHost, Integer.parseInt(args[1])).execute();
+            	new ClientTest(localHost, Integer.parseInt(args[1]));
             } else {
             	System.err.println("Digita \"Server\" o \"Worker\" seguiti dalla porta!");
             }

@@ -1,8 +1,10 @@
 package Client;
 
-import java.util.Vector;
-
 public class JavaProgram implements Job {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	int id = 0;
 	
 	public Object run(Object parameters) {

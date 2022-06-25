@@ -12,11 +12,14 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
 import Client.Job;
+import Client.ServerCallback;
 import Worker.WorkerServer;
 
 public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	
 	private static ArrayList<WorkerServer> workers;
+	private static ArrayList<WorkerServer> busyWorkers;
+	private static ArrayList<WorkerServer> availableWorkers;
 	private Registry registry;
 	private String lineString;
 
@@ -31,6 +34,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		registry.rebind("master", this);
 		
 		workers = new ArrayList<WorkerServer>();        
+		availableWorkers = new ArrayList<WorkerServer>();  
 		
 		try {
 			String addressString = (InetAddress.getLocalHost()).toString();
@@ -80,20 +84,24 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public Object execute(Job j, Object parameters) throws RemoteException {
+	/*public Object execute(Job j, Object parameters) throws RemoteException {
 		//devo controllare se ci sono worker liberi
 		
-		for(WorkerServer w: workers) {
-			System.out.println("Work distributed!");
-			return w.start( j, parameters);
+		System.out.println("E'stata richiesta l'esecuzione di un'applicazione");
+		System.out.println("Attualmente ci sono :"+ workers.size()+" Worker disponibili");
+
+		if(availableWorkers.size()>0) {
+			WorkerServer w = availableWorkers.remove(0);
+				return w.start( j, parameters);	
 		}
-		
-		return null;
-	}
+		return -1;
+	}*/
+	
 	
 	@Override
 	public void connectWorker(WorkerServer w) throws RemoteException {
 		workers.add(w);
+		availableWorkers.add(w);
 		System.out.println("Server: Worker" + w + " connesso!");
 		System.out.println("Server: Attualmente sono disponibili: " + workers.size()+ " Worker");
 	}
@@ -105,7 +113,18 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		System.out.println("Server: Attualmente sono disponibili: " + workers.size()+ " Worker");
 	}
 
-	
-	
+	@Override
+	public void startRequest(ServerCallback sc, Job j, Object parameters) throws RemoteException {
+		System.out.println("Il Client si è connesso al Master richiedento l'esecuzione del JOB");
+		System.out.println("Attualmente ci sono :"+ workers.size()+" Worker disponibili");
+		
+		if(availableWorkers.size()>0) {
+			WorkerServer w = availableWorkers.remove(0);
+			// in questo modo il Client non è bloccato dalla richiesta che ha effettuato
+				 sc.getResult(w.start( j, parameters));	
+		}
+
+	}
+
 
 }
