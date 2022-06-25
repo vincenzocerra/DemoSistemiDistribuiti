@@ -9,7 +9,15 @@ public class JavaProgram implements Job {
 	
 	public Object run(Object parameters) {
 		
-		return (99);
+		System.out.println("ESECUZIONE DI UNA GENERICA APPLICAZIONE JAVA");
+		try {
+			Thread.sleep((int) parameters);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return (parameters);
 	}
 
 	@Override

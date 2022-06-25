@@ -10,6 +10,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 import Client.Job;
+import Client.ServerCallback;
 import Master.MasterServer;
 
 public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
@@ -63,12 +64,10 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 		System.exit(-1);
 	}
 
-
-	@Override
-	public Object start(Job j, Object parameters) throws RemoteException {
-		
+	public void start(ServerCallback sc, Job j, Object parameters) throws RemoteException {
 		System.out.println("Worker: Sto procedendo ad eseguire l'applicazione");
-		
-		return j.run(parameters);
+		 Object result = j.run(parameters);
+		 master.finishJob(sc,result,this);
+		 
 	}
 }

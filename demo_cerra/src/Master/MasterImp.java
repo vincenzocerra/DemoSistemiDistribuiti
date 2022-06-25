@@ -118,13 +118,26 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		System.out.println("Il Client si è connesso al Master richiedento l'esecuzione del JOB");
 		System.out.println("Attualmente ci sono :"+ workers.size()+" Worker disponibili");
 		
+		
+		// qui tutto deve essere preso in carico da un thread 
+		// che verifichi che ci sia il worker disponibile, accodi le richieste e che avvii il medoto start di w 
+		
 		if(availableWorkers.size()>0) {
 			WorkerServer w = availableWorkers.remove(0);
-			// in questo modo il Client non è bloccato dalla richiesta che ha effettuato
-				 sc.getResult(w.start( j, parameters));	
+			// in questo modo il Client non è bloccato dalla richiesta che ha effettuato		 
+			w.start(sc, j, parameters);			 	
 		}
 
 	}
+	@Override
+	public void finishJob(ServerCallback sc, Object result, WorkerServer w) throws RemoteException {
+		availableWorkers.add(w);
+		System.out.println(result);
+		sc.getResult(result);
+		
+	}
 
+
+	
 
 }
