@@ -18,8 +18,8 @@ import Worker.WorkerServer;
 public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	
 	private static ArrayList<WorkerServer> workers;
-	private static ArrayList<WorkerServer> busyWorkers;
-	private static ArrayList<WorkerServer> availableWorkers;
+	private static SynchroListImp<Job> executionQueue;
+	private static SynchroListImp<WorkerServer> availableWorkers;
 	private Registry registry;
 	private String lineString;
 
@@ -33,8 +33,9 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		registry = LocateRegistry.createRegistry(port);
 		registry.rebind("master", this);
 		
-		workers = new ArrayList<WorkerServer>();        
-		availableWorkers = new ArrayList<WorkerServer>();  
+		workers = new ArrayList<WorkerServer>();
+		availableWorkers = new SynchroListImp<WorkerServer>();
+		executionQueue = new SynchroListImp<Job>();
 		
 		try {
 			String addressString = (InetAddress.getLocalHost()).toString();
@@ -101,7 +102,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	@Override
 	public void connectWorker(WorkerServer w) throws RemoteException {
 		workers.add(w);
-		availableWorkers.add(w);
+		availableWorkers.put(w);
 		System.out.println("Server: Worker" + w + " connesso!");
 		System.out.println("Server: Attualmente sono disponibili: " + workers.size()+ " Worker");
 	}
@@ -109,6 +110,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	@Override
 	public void disconnectWorker(WorkerServer w) throws RemoteException {
 		workers.remove(w);
+		availableWorkers.remove(w);
 		System.out.println("Server: Worker" + w + " Disconnesso!");
 		System.out.println("Server: Attualmente sono disponibili: " + workers.size()+ " Worker");
 	}
@@ -118,20 +120,23 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		System.out.println("Il Client si è connesso al Master richiedento l'esecuzione del JOB");
 		System.out.println("Attualmente ci sono :"+ workers.size()+" Worker disponibili");
 		
-		
 		// qui tutto deve essere preso in carico da un thread 
 		// che verifichi che ci sia il worker disponibile, accodi le richieste e che avvii il medoto start di w 
 		
-		if(availableWorkers.size()>0) {
-			WorkerServer w = availableWorkers.remove(0);
+		executionQueue.put(j);
+		MasterThread gestoreTurno = new MasterThread(sc, j, parameters,executionQueue,availableWorkers);
+		gestoreTurno.start();
+		
+		/*if(availableWorkers.size()>0) {
+			WorkerServer w = availableWorkers.get();
 			// in questo modo il Client non è bloccato dalla richiesta che ha effettuato		 
 			w.start(sc, j, parameters);			 	
-		}
+		}*/
 
 	}
 	@Override
 	public void finishJob(ServerCallback sc, Object result, WorkerServer w) throws RemoteException {
-		availableWorkers.add(w);
+		availableWorkers.put(w);
 		System.out.println(result);
 		sc.getResult(result);
 		

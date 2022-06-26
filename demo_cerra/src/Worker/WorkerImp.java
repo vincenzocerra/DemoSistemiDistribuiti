@@ -67,6 +67,7 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 	public void start(ServerCallback sc, Job j, Object parameters) throws RemoteException {
 		System.out.println("Worker: Sto procedendo ad eseguire l'applicazione");
 		 Object result = j.run(parameters);
+		 System.out.println("Ho finito di calcolare il risultato: "+result+" lo comunico al Master" );
 		 master.finishJob(sc,result,this);
 		 
 	}

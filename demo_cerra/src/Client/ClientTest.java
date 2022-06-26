@@ -19,7 +19,10 @@ public class ClientTest implements ServerCallback {
 		master = (MasterServer) (registry.lookup("master"));
 		job = new JavaProgram();
 		System.out.println("Client : Invio richiesta esecuzione Job");
-		master.startRequest(this,job,9000); 
+		master.startRequest(this,job,25000);
+		master.startRequest(this,job,4000); 
+		master.startRequest(this,job,12000); 
+		master.startRequest(this,job,1000); 
 		System.out.println("Verifica Callback non bloccante");
 // implementato con Callback
 	}
@@ -33,5 +36,9 @@ public class ClientTest implements ServerCallback {
 	@Override
 	public void getResult(Object result) throws RemoteException {
 		System.out.println("The result is: " + result);
+	}
+	@Override
+	public void notifyInfo(String info) throws RemoteException {
+		System.out.println(info);
 	}
 }

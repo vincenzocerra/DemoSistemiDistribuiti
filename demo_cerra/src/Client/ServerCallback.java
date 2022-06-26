@@ -8,5 +8,6 @@ public interface ServerCallback extends Remote {
 	//verra infatti ricontattato direttamente dal master
 	
 	public void getResult(Object result) throws RemoteException;
-
+	
+	public void notifyInfo(String info) throws RemoteException;
 }
