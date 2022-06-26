@@ -14,12 +14,14 @@ public class Launcher {
     public static void main(String[] args) {
         try {
             if (args[0].equals("Master")) {
-                new MasterImp(Integer.parseInt(args[1]));
+                new MasterImp(Integer.parseInt(args[1])).startConsole();
                 } 
             else if (args[0].equals("Worker")){
                 new WorkerImp(localHost, Integer.parseInt(args[1])).startConsole();
             }else if (args[0].equals("Client")) {
-            	new ClientTest(localHost, Integer.parseInt(args[1]));
+            	new ClientTest(localHost, Integer.parseInt(args[1]),"Luigi");
+            	new ClientTest(localHost, Integer.parseInt(args[1]),"Federico");
+            	new ClientTest(localHost, Integer.parseInt(args[1]),"Mario");
             } else {
             	System.err.println("Digita \"Server\" o \"Worker\" seguiti dalla porta!");
             }

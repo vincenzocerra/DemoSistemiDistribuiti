@@ -38,7 +38,6 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 		}
 		
 	}
-	
 	public void startConsole() {
 		String line;
 		

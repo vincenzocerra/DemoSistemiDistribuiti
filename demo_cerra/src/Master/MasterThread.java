@@ -9,30 +9,30 @@ public class MasterThread extends Thread {
 	private ServerCallback client;
 	private Job j;
 	private Object parameters;
-	private SynchroList<Job> jobList;
-	private SynchroList<WorkerServer> workerList;
+	private SynchroList<Job> jobQueue;
+	private SynchroList<WorkerServer> availableWorker;
 	private WorkerServer w;
 	
 	private boolean check;
 
 	
-	MasterThread(ServerCallback client,Job j, Object parameters, SynchroList<Job> jobList, SynchroList<WorkerServer> workerList){
+	MasterThread(ServerCallback client,Job j, Object parameters, SynchroList<Job> jobQueue, SynchroList<WorkerServer> availableWorker){
 		check = true;
 		this.client = client;
 		this.j =j;
 		this.parameters=parameters;
-		this.jobList = jobList;
-		this.workerList = workerList;
+		this.jobQueue = jobQueue;
+		this.availableWorker = availableWorker;
 		
 	}
 	
 	public void run()	{	
    		while (check) {
 			try {
-				if(workerList.size()>0) {
-					if (jobList.getFirst().equals(j)) {
-						w = workerList.get();
-						jobList.get();
+				if(availableWorker.size()>0) {
+					if (jobQueue.getFirst().equals(j)) {
+						w = availableWorker.get();
+						jobQueue.get();
 						//client.notifyInfo("La tua richiesta è stata presa in carico da un Worker");
 						w.start(client, j, parameters);
 						check = false;

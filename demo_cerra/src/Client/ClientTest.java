@@ -11,14 +11,17 @@ import Master.MasterServer;
 public class ClientTest implements ServerCallback {
 	private MasterServer master;
 	private Job job;
+	String nome;
 
-	public ClientTest(String host, int port) throws RemoteException, NotBoundException {
+	public ClientTest(String host, int port,String nome) throws RemoteException, NotBoundException {
+		this.nome=nome;
 		System.out.println("Client started!");
 		Registry registry = LocateRegistry.getRegistry(host, port);
 		UnicastRemoteObject.exportObject(this,1098);
 		master = (MasterServer) (registry.lookup("master"));
 		job = new JavaProgram();
-		System.out.println("Client : Invio richiesta esecuzione Job");
+		System.out.println("Client "+nome+" Ha inviato alcune applicazioni da eseguire");
+		master.startRequest(this,job,25000);
 		master.startRequest(this,job,25000);
 		master.startRequest(this,job,4000); 
 		master.startRequest(this,job,12000); 
@@ -35,7 +38,7 @@ public class ClientTest implements ServerCallback {
 
 	@Override
 	public void getResult(Object result) throws RemoteException {
-		System.out.println("The result is: " + result);
+		System.out.println(""+nome+" : risultato: " + result);
 	}
 	@Override
 	public void notifyInfo(String info) throws RemoteException {

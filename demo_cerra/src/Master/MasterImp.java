@@ -10,6 +10,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import Client.Job;
 import Client.ServerCallback;
@@ -45,10 +46,9 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 			e.printStackTrace();
 		}
 		
-		startConsole();
 	}
 	
-	private void startConsole() {
+	public void startConsole() {
 		System.out.println("CONSOLE");
 		System.out.println("Premi 'q' per uscire o 's' per verificare il numero di WORKER registrati");
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -103,8 +103,8 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	public void connectWorker(WorkerServer w) throws RemoteException {
 		workers.add(w);
 		availableWorkers.put(w);
-		System.out.println("Server: Worker" + w + " connesso!");
-		System.out.println("Server: Attualmente sono disponibili: " + workers.size()+ " Worker");
+		System.out.println("Master "+serialVersionUID+": Worker" + w + " connesso!");
+		System.out.println("Master "+serialVersionUID+": Attualmente sono disponibili: " + workers.size()+ " Worker");
 	}
 
 	@Override
@@ -126,12 +126,6 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		executionQueue.put(j);
 		MasterThread gestoreTurno = new MasterThread(sc, j, parameters,executionQueue,availableWorkers);
 		gestoreTurno.start();
-		
-		/*if(availableWorkers.size()>0) {
-			WorkerServer w = availableWorkers.get();
-			// in questo modo il Client non è bloccato dalla richiesta che ha effettuato		 
-			w.start(sc, j, parameters);			 	
-		}*/
 
 	}
 	@Override
@@ -141,6 +135,8 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		sc.getResult(result);
 		
 	}
+	
+	
 
 
 	
