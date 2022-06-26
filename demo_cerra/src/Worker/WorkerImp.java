@@ -11,6 +11,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 import Client.Job;
 import Client.ServerCallback;
+import Master.MasterImp;
 import Master.MasterServer;
 
 public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
@@ -34,14 +35,14 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 			master.connectWorker(this);
 
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			System.out.println("Nessun Master Disponibile sulla porta selezionata");
+			System.exit(-1);
 		}
+		System.out.println("Connessione avvenuta con Successo");
 		
 	}
 	public void startConsole() {
 		String line;
-		
-		System.out.println("Connessione avvenuta con Successo");
 		System.out.println("CONSOLE");
 		System.out.println("Digita  \"q\" per disconnetterti");
 		BufferedReader bReader = new BufferedReader(new InputStreamReader(System.in));
@@ -70,4 +71,53 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 		 master.finishJob(sc,result,this);
 		 
 	}
+	
+	public static void main(String[] args) throws IOException, NotBoundException {
+		 BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		 boolean ok = false;
+		 int port = 6000;
+		 int scelta=0;
+		 int workers=1;
+		 while (ok != true) {
+			 System.out.println("Esecuzione Singola (1) o Esecuzione Multipla (2)");
+			 try {
+					scelta = Integer.parseInt(br.readLine());
+				}catch(NumberFormatException e) {
+					System.out.println("Bisogna inserire un numero tra 1 e 2 !");
+					continue;
+				}
+			 if(scelta != 1 && scelta !=2)continue;
+			 else {
+				 ok = true; 
+			 }
+		 }
+		 ok=false;
+		 while (ok != true) {
+			 System.out.println("Inserire la porta");
+			 try {
+					port = Integer.parseInt(br.readLine());
+				}catch(NumberFormatException e) {
+					System.out.println("Bisogna inserire un numero compreso tra !");
+					continue;
+				}
+			 if(scelta ==2) {
+				 System.out.println("Inserire il numero di Worker");
+			 try {
+					workers = Integer.parseInt(br.readLine());
+				}catch(NumberFormatException e) {
+					System.out.println("Bisogna inserire un numero tra 2 e n !");
+					continue;
+				}
+			 }
+			 try {
+				 for(int i = 0; i< workers;i++) {
+					WorkerImp wi= new WorkerImp("127.0.0.1",port);
+					if(scelta==1)wi.startConsole();
+					ok =true;
+				 }
+				} catch (RemoteException e) {
+					ok =false;
+				}
+			}// while	 
+	 }
 }

@@ -27,7 +27,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 
 	public MasterImp(int port) throws RemoteException {
 		super();
-		System.out.println("Master avviato con successo");
+		System.out.println("Avvio Master");
 		
 		//aggiorno le informazioni di registro
 		
@@ -136,9 +136,29 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		
 	}
 	
-	
-
-
+	 public static void main(String[] args) throws IOException {
+		
+		 BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		 boolean ok = false;
+		 int port = 6000;
+		 while (ok != true) {
+			 System.out.println("Inserire la porta del master");
+			 try {
+					port = Integer.parseInt(br.readLine());
+				}catch(NumberFormatException e) {
+					System.out.println("Bisogna inserire un numero compreso tra !");
+					continue;
+				}
+			 ok = true;
+			 try {
+					MasterImp mi= new MasterImp(port);
+					mi.startConsole();
+				} catch (RemoteException e) {
+					System.out.println("Porta in uso da un altro Master");
+					ok =false;
+				}
+			}// while	 
+	 }
 	
 
 }
