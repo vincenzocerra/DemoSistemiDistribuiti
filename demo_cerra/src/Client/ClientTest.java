@@ -15,35 +15,22 @@ import Worker.WorkerImp;
 
 public class ClientTest implements ServerCallback {
 	private MasterServer master;
-	private Job job;
-	String nome;
+	String id;
 
-	public ClientTest(String host, int port,String nome) throws RemoteException, NotBoundException {
-		this.nome=nome;
+	public ClientTest(String host, int port,String id) throws RemoteException, NotBoundException {
+		this.id=id;
 		System.out.println("Client started!");
 		Registry registry = LocateRegistry.getRegistry(host, port);
 		UnicastRemoteObject.exportObject(this,1098);
 		master = (MasterServer) (registry.lookup("master"));
-		job = new JavaProgram();
-		System.out.println("Client "+nome+" Ha inviato alcune applicazioni da eseguire");
-		master.startRequest(this,job,25000);
-		master.startRequest(this,job,25000);
-		master.startRequest(this,job,4000); 
-		master.startRequest(this,job,12000); 
-		master.startRequest(this,job,1000); 
+		GestoreRichieste gestore = new GestoreRichieste(this,master,2);
+		gestore.start();
 		System.out.println("Verifica Callback non bloccante");
-// implementato con Callback
-	}
-
-	/*public void execute() throws RemoteException {
-		// implementazione bloccante senza callback
-		int result = (int) master.execute(job,1);
-		System.out.println("The result is: " + result);
-	}*/ 
+	} 
 
 	@Override
 	public void getResult(Object result) throws RemoteException {
-		System.out.println(""+nome+" : risultato: " + result);
+		System.out.println(""+id+" : risultato: " + result);
 	}
 	@Override
 	public void notifyInfo(String info) throws RemoteException {
@@ -79,7 +66,7 @@ public class ClientTest implements ServerCallback {
 					continue;
 				}
 			 if(scelta ==2) {
-				 System.out.println("Inserire il numero di Worker");
+				 System.out.println("Inserire il numero di Client da connettere");
 			 try {
 					client = Integer.parseInt(br.readLine());
 				}catch(NumberFormatException e) {
@@ -89,7 +76,7 @@ public class ClientTest implements ServerCallback {
 			 }
 			 try {
 				 for(int i = 0; i< client;i++) {
-					 ClientTest cli= new ClientTest("127.0.0.1",port,""+i);
+					 new ClientTest("127.0.0.1",port,""+i);
 					ok =true;
 				 }
 				} catch (RemoteException e) {
