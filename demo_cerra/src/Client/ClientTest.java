@@ -7,34 +7,56 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.ExportException;
 import java.rmi.server.UnicastRemoteObject;
 
-import Master.MasterImp;
 import Master.MasterServer;
-import Worker.WorkerImp;
 
 public class ClientTest implements ServerCallback {
 	private MasterServer master;
 	String id;
+	int executeProgramCount;
+	private int exportPort;
 
-	public ClientTest(String host, int port,String id) throws RemoteException, NotBoundException {
+	public ClientTest(String host, int port,String id, int executeProgramCount) throws RemoteException, NotBoundException {
 		this.id=id;
-		System.out.println("Client started!");
+		this.executeProgramCount=executeProgramCount;
+		exportPort=1100;
+		
+		System.out.println("Client "+id+" in esecuzione : inviera' "+executeProgramCount+ " richieste di esecuzione al Master"	);
 		Registry registry = LocateRegistry.getRegistry(host, port);
-		UnicastRemoteObject.exportObject(this,1098);
+		exportClass();
 		master = (MasterServer) (registry.lookup("master"));
-		GestoreRichieste gestore = new GestoreRichieste(this,master,2);
+		GestoreRichieste gestore = new GestoreRichieste(this,master,executeProgramCount);
 		gestore.start();
-		System.out.println("Verifica Callback non bloccante");
-	} 
+	}
+	
+	private void exportClass() throws RemoteException {
+		boolean export = false;
+		while(export!=true) {
+			int c=0;
+		try {
+			UnicastRemoteObject.exportObject(this,exportPort+c);
+			}catch(ExportException e) {
+				System.out.println("Errore nell'export della classe");
+				c++;
+			}
+		export = true;
+		}	
+	}
 
 	@Override
 	public void getResult(Object result) throws RemoteException {
-		System.out.println(""+id+" : risultato: " + result);
+		System.out.println("Client "+id+" : il master mi ha comunicato il risultato dell'applicazione : " + result);
 	}
 	@Override
 	public void notifyInfo(String info) throws RemoteException {
 		System.out.println(info);
+	}
+	@Override
+	public String getid(String id) throws RemoteException {
+		return this.id;
+		
 	}
 	
 	public static void main(String[] args) throws IOException, NotBoundException {
@@ -76,7 +98,7 @@ public class ClientTest implements ServerCallback {
 			 }
 			 try {
 				 for(int i = 0; i< client;i++) {
-					 new ClientTest("127.0.0.1",port,""+i);
+					 new ClientTest("127.0.0.1",port,""+i,3);
 					ok =true;
 				 }
 				} catch (RemoteException e) {

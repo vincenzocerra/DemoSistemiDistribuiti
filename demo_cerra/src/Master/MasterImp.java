@@ -117,12 +117,10 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 
 	@Override
 	public void startRequest(ServerCallback sc, Job j, Object parameters) throws RemoteException {
-		System.out.println("Il Client si è connesso al Master richiedento l'esecuzione del JOB");
-		System.out.println("Attualmente ci sono :"+ workers.size()+" Worker disponibili");
-		
+		String cId = "";
+		System.out.println("Master : ho ricevuto una richiesta di esecuzione di un'applicazione da parte del Client");		
 		// qui tutto deve essere preso in carico da un thread 
 		// che verifichi che ci sia il worker disponibile, accodi le richieste e che avvii il medoto start di w 
-		
 		executionQueue.put(j);
 		MasterThread gestoreTurno = new MasterThread(sc, j, parameters,executionQueue,availableWorkers);
 		gestoreTurno.start();

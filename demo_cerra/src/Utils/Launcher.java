@@ -19,9 +19,9 @@ public class Launcher {
             else if (args[0].equals("Worker")){
                 new WorkerImp(localHost, Integer.parseInt(args[1])).startConsole();
             }else if (args[0].equals("Client")) {
-            	new ClientTest(localHost, Integer.parseInt(args[1]),"Luigi");
-            	new ClientTest(localHost, Integer.parseInt(args[1]),"Federico");
-            	new ClientTest(localHost, Integer.parseInt(args[1]),"Mario");
+            	new ClientTest(localHost, Integer.parseInt(args[1]),"Luigi",2);
+            	new ClientTest(localHost, Integer.parseInt(args[1]),"Federico",3);
+            	new ClientTest(localHost, Integer.parseInt(args[1]),"Mario",4);
             } else {
             	System.err.println("Digita \"Server\" o \"Worker\" seguiti dalla porta!");
             }

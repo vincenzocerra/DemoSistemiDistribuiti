@@ -28,6 +28,7 @@ public class GestoreRichieste extends Thread {
 		try {
 			int durataProgramma=(int)(Math.random() * (60000 - 10000) + 10000);
 			master.startRequest(c,job,durataProgramma);
+			System.out.println("Client "+c.id+": ho inviato una nuova richiesta di esecuzione al Master");
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
