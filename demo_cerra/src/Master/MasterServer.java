@@ -13,7 +13,7 @@ public interface MasterServer extends Remote{
 	
 	public void startRequest(ServerCallback sc,Job j, Object parameters) throws RemoteException;
 	
-	public void finishJob(ServerCallback sc,Object result, WorkerServer w) throws RemoteException;
+	public void finishJob(ServerCallback sc,int idJob,Object result, WorkerServer w) throws RemoteException;
 	
 	public void connectWorker(WorkerServer w) throws RemoteException;
 	

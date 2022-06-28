@@ -23,11 +23,13 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 	
 	private MasterServer master;
 	private boolean running = true;
+	int id;
 
-	public WorkerImp(String host, int port) throws RemoteException, NotBoundException {
+	public WorkerImp(String host, int port, int id) throws RemoteException, NotBoundException {
 		super();
+		this.id = id;
 		
-		System.out.println("Worker: Sta cercando di connettersi al server: " + host + " port: " + port);
+		System.out.println("Worker "+id+": Sto cercando di connettermi al server: " + host + " port: " + port);
 		
 		try {
 			Registry registry = LocateRegistry.getRegistry(host, port);
@@ -63,12 +65,17 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 		}
 		System.exit(-1);
 	}
+	
+	public int getId() {
+		return id;
+	}
 
 	public void start(ServerCallback sc, Job j, Object parameters) throws RemoteException {
-		System.out.println("Worker: Sto procedendo ad eseguire l'applicazione");
+		System.out.println("Worker "+id+": Sto procedendo ad eseguire l'app "+j.getId());
 		 Object result = j.run(parameters);
-		 System.out.println("Ho finito di calcolare il risultato: "+result+" lo comunico al Master" );
-		 master.finishJob(sc,result,this);
+		 int jID = j.getId();
+		 System.out.println("Worker "+id+" ho calcolato l'app "+jID+": "+result+" lo comunico al Master" );
+		 master.finishJob(sc,jID,result,this);
 		 
 	}
 	
@@ -111,7 +118,7 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 			 }
 			 try {
 				 for(int i = 0; i< workers;i++) {
-					WorkerImp wi= new WorkerImp("127.0.0.1",port);
+					WorkerImp wi= new WorkerImp("127.0.0.1",port,i);
 					if(scelta==1)wi.startConsole();
 					ok =true;
 				 }

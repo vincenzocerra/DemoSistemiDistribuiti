@@ -10,8 +10,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.UUID;
-
 import Client.Job;
 import Client.ServerCallback;
 import Worker.WorkerServer;
@@ -103,22 +101,21 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	public void connectWorker(WorkerServer w) throws RemoteException {
 		workers.add(w);
 		availableWorkers.put(w);
-		System.out.println("Master "+serialVersionUID+": Worker" + w + " connesso!");
-		System.out.println("Master "+serialVersionUID+": Attualmente sono disponibili: " + workers.size()+ " Worker");
+		System.out.println("Master: Worker " + w.getId() + " connesso!");
+		System.out.println("Master: Attualmente sono disponibili: " + workers.size()+ " Worker");
 	}
 
 	@Override
 	public void disconnectWorker(WorkerServer w) throws RemoteException {
 		workers.remove(w);
 		availableWorkers.remove(w);
-		System.out.println("Server: Worker" + w + " Disconnesso!");
-		System.out.println("Server: Attualmente sono disponibili: " + workers.size()+ " Worker");
+		System.out.println("Master: Worker " +w.getId()+ " Disconnesso!");
+		System.out.println("Master: Attualmente sono disponibili: " + workers.size()+ " Worker");
 	}
 
 	@Override
 	public void startRequest(ServerCallback sc, Job j, Object parameters) throws RemoteException {
-		String cId = "";
-		System.out.println("Master : ho ricevuto una richiesta di esecuzione di un'applicazione da parte del Client");		
+		System.out.println("Master: ho ricevuto la richiesta di esecuzione dell'app "+j.getId()+" dal Client "+sc.getId());		
 		// qui tutto deve essere preso in carico da un thread 
 		// che verifichi che ci sia il worker disponibile, accodi le richieste e che avvii il medoto start di w 
 		executionQueue.put(j);
@@ -127,10 +124,10 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 
 	}
 	@Override
-	public void finishJob(ServerCallback sc, Object result, WorkerServer w) throws RemoteException {
+	public void finishJob(ServerCallback sc,int iDJob, Object result, WorkerServer w) throws RemoteException {
 		availableWorkers.put(w);
-		System.out.println(result);
-		sc.getResult(result);
+		System.out.println("Master: Il worker "+w.getId()+" mi ha comunicato il risultato dell'app "+iDJob+": "+result+", lo inoltro al client "+sc.getId());
+		sc.getResult(iDJob,result);
 		
 	}
 	

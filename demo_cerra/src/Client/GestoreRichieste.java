@@ -10,6 +10,8 @@ public class GestoreRichieste extends Thread {
 	private MasterServer master;
 	private int richiesteCount;
 	boolean check;
+	private int maxSleep= 30000;
+	private int minSleep= 2000;
 	
 	
 	public GestoreRichieste(ClientTest c, MasterServer master, int richiesteCount) {
@@ -17,24 +19,22 @@ public class GestoreRichieste extends Thread {
 		this.c = c;
 		this.master = master;
 		this.richiesteCount=richiesteCount;
-		job = new JavaProgram();
-		
-		
 	}
 	
 	public void run()	{
 		int counter=0;
 		while (check) {
 		try {
-			int durataProgramma=(int)(Math.random() * (60000 - 10000) + 10000);
-			master.startRequest(c,job,durataProgramma);
-			System.out.println("Client "+c.id+": ho inviato una nuova richiesta di esecuzione al Master");
+			job = new JavaProgram();
+			job.setId(counter);
+			master.startRequest(c,job,1);
+			System.out.println("Client "+c.id+": ho richiesto l'esecuzione dell'app "+job.getId()+" al Master");
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		try {
-			int timeForNewRequest=(int)(Math.random() * (30000 - 2000) + 2000);
+			int timeForNewRequest=(int)(Math.random() * (maxSleep - minSleep) + minSleep);
 			Thread.sleep(timeForNewRequest);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

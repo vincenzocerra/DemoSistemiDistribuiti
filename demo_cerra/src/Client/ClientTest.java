@@ -14,16 +14,16 @@ import Master.MasterServer;
 
 public class ClientTest implements ServerCallback {
 	private MasterServer master;
-	String id;
+	int id;
 	int executeProgramCount;
 	private int exportPort;
 
-	public ClientTest(String host, int port,String id, int executeProgramCount) throws RemoteException, NotBoundException {
+	public ClientTest(String host, int port,int id, int executeProgramCount) throws RemoteException, NotBoundException {
 		this.id=id;
 		this.executeProgramCount=executeProgramCount;
 		exportPort=1100;
 		
-		System.out.println("Client "+id+" in esecuzione : inviera' "+executeProgramCount+ " richieste di esecuzione al Master"	);
+		System.out.println("Client "+id+": Esecuzione avviata, inviera' "+executeProgramCount+ " richieste di esecuzione al Master"	);
 		Registry registry = LocateRegistry.getRegistry(host, port);
 		exportClass();
 		master = (MasterServer) (registry.lookup("master"));
@@ -46,16 +46,21 @@ public class ClientTest implements ServerCallback {
 	}
 
 	@Override
-	public void getResult(Object result) throws RemoteException {
-		System.out.println("Client "+id+" : il master mi ha comunicato il risultato dell'applicazione : " + result);
+	public void getResult(int idJob, Object result) throws RemoteException {
+		System.out.println("Client "+id+": il master mi ha comunicato il risultato dell'app "+idJob+" : " + result);
 	}
 	@Override
 	public void notifyInfo(String info) throws RemoteException {
 		System.out.println(info);
 	}
 	@Override
-	public String getid(String id) throws RemoteException {
+	public int getId() throws RemoteException {
 		return this.id;
+		
+	}
+	
+	public void setId(int id) {
+		this.id = id;
 		
 	}
 	
@@ -98,13 +103,12 @@ public class ClientTest implements ServerCallback {
 			 }
 			 try {
 				 for(int i = 0; i< client;i++) {
-					 new ClientTest("127.0.0.1",port,""+i,3);
+					 
+					 new ClientTest("127.0.0.1",port,i,3);
 					ok =true;
 				 }
 				} catch (RemoteException e) {
-					System.out.println("Problema");
-					System.out.println(e);
-
+					System.out.println("Nessun Master connesso a questa porta");
 					ok =false;
 				}
 			}// while	 

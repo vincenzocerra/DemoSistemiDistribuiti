@@ -59,7 +59,7 @@ public class SimpleLauncher {
 						int all = workerNumber.get(m);
 						for(int w = 0; w < all ; w++) {
 							try {
-								new WorkerImp(localHost, startingPort+m );
+								new WorkerImp(localHost, startingPort+m ,w);
 					        } catch (RemoteException e) {
 					            System.err.println(e);   
 							}

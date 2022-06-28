@@ -29,11 +29,11 @@ public class MasterThread extends Thread {
 	public void run()	{	
    		while (check) {
 			try {
-				if(availableWorker.size()>0) {
+				if(availableWorker.size()>0 && jobQueue.size()>0) {
 					if (jobQueue.getFirst().equals(j)) {
 						w = availableWorker.get();
 						jobQueue.get();
-						//client.notifyInfo("La tua richiesta è stata presa in carico da un Worker");
+						System.out.println("Master : assegno l'esecuzione dell'app "+j.getId()+" al worker "+w.getId());
 						w.start(client, j, parameters);
 						check = false;
 					}

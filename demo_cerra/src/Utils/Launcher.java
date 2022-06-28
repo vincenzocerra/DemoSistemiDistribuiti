@@ -17,11 +17,11 @@ public class Launcher {
                 new MasterImp(Integer.parseInt(args[1])).startConsole();
                 } 
             else if (args[0].equals("Worker")){
-                new WorkerImp(localHost, Integer.parseInt(args[1])).startConsole();
+                new WorkerImp(localHost, Integer.parseInt(args[1]),1).startConsole();
             }else if (args[0].equals("Client")) {
-            	new ClientTest(localHost, Integer.parseInt(args[1]),"Luigi",2);
-            	new ClientTest(localHost, Integer.parseInt(args[1]),"Federico",3);
-            	new ClientTest(localHost, Integer.parseInt(args[1]),"Mario",4);
+            	new ClientTest(localHost, Integer.parseInt(args[1]),1,2);
+            	new ClientTest(localHost, Integer.parseInt(args[1]),2,3);
+            	new ClientTest(localHost, Integer.parseInt(args[1]),3,4);
             } else {
             	System.err.println("Digita \"Server\" o \"Worker\" seguiti dalla porta!");
             }

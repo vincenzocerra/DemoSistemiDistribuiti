@@ -4,18 +4,25 @@ public class JavaProgram implements Job {
 
 	private static final long serialVersionUID = 1L;
 	int id = 0;
+	private int maxDuration= 60000;
+	private int minDuration= 10000;
+	int durataProgramma;
+	
+	public JavaProgram() {
+		durataProgramma=(int)(Math.random() * (maxDuration - minDuration) + minDuration);
+
+	}
 	
 	public Object run(Object parameters) {
 		
-		System.out.println("ESECUZIONE DI UNA GENERICA APPLICAZIONE JAVA");
 		try {
-			Thread.sleep((int) parameters);
+			Thread.sleep(durataProgramma);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		return (parameters);
+		return (durataProgramma);
 	}
 
 	@Override
