@@ -10,23 +10,27 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import Client.Job;
 import Client.ServerCallback;
 import Worker.WorkerServer;
 
 public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	
-	private static ArrayList<WorkerServer> workers;
-	private static SynchroListImp<Job> executionQueue;
-	private static SynchroListImp<WorkerServer> availableWorkers;
+	protected static ArrayList<WorkerServer> workers;
+	static SynchroListImp<Job> executionQueue;
+	static SynchroListImp<WorkerServer> availableWorkers;
+	static Map<WorkerServer, ExecInfo> inEsecuzione;
 	private Registry registry;
 	private String lineString;
 
 
 	public MasterImp(int port) throws RemoteException {
 		super();
-		System.out.println("Avvio Master");
-		
+		System.out.println("Avvio Master");		
 		//aggiorno le informazioni di registro
 		
 		registry = LocateRegistry.createRegistry(port);
@@ -35,7 +39,11 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		workers = new ArrayList<WorkerServer>();
 		availableWorkers = new SynchroListImp<WorkerServer>();
 		executionQueue = new SynchroListImp<Job>();
+		inEsecuzione = Collections.synchronizedMap(new HashMap<WorkerServer,ExecInfo>());
 		
+		WorkerScanner ws= new WorkerScanner(this);
+		ws.start();
+
 		try {
 			String addressString = (InetAddress.getLocalHost()).toString();
 			System.out.println("Il Master è in esecuzione su " + addressString + ", port: " + port);
@@ -96,6 +104,18 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		return -1;
 	}*/
 	
+	protected void handleDisconnection(WorkerServer w) throws RemoteException {
+		workers.remove(w);
+		if(inEsecuzione.containsKey(w)) {
+			ExecInfo info = inEsecuzione.get(w);
+			Job j = info.getJ();
+			executionQueue.put(j);
+			MasterThread gestoreTurno = new MasterThread(info);
+			gestoreTurno.start();
+			
+		}
+		
+	}
 	
 	@Override
 	public void connectWorker(WorkerServer w) throws RemoteException {
@@ -118,8 +138,10 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		System.out.println("Master: ho ricevuto la richiesta di esecuzione dell'app "+j.getId()+" dal Client "+sc.getId());		
 		// qui tutto deve essere preso in carico da un thread 
 		// che verifichi che ci sia il worker disponibile, accodi le richieste e che avvii il medoto start di w 
+		
+		ExecInfo info = new ExecInfo(sc,j,parameters);
 		executionQueue.put(j);
-		MasterThread gestoreTurno = new MasterThread(sc, j, parameters,executionQueue,availableWorkers);
+		MasterThread gestoreTurno = new MasterThread(info);
 		gestoreTurno.start();
 
 	}

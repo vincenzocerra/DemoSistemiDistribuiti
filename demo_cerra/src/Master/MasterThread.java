@@ -14,16 +14,17 @@ public class MasterThread extends Thread {
 	private WorkerServer w;
 	
 	private boolean check;
+	private ExecInfo info;
 
 	
-	MasterThread(ServerCallback client,Job j, Object parameters, SynchroList<Job> jobQueue, SynchroList<WorkerServer> availableWorker){
+	MasterThread(ExecInfo info){
 		check = true;
-		this.client = client;
-		this.j =j;
-		this.parameters=parameters;
-		this.jobQueue = jobQueue;
-		this.availableWorker = availableWorker;
-		
+		this.info=info;
+		this.client = info.getSc();
+		this.j =info.getJ();
+		this.parameters=info.getParameters();
+		this.jobQueue = MasterImp.executionQueue;
+		this.availableWorker = MasterImp.availableWorkers;		
 	}
 	
 	public void run()	{	
@@ -35,6 +36,8 @@ public class MasterThread extends Thread {
 						jobQueue.get();
 						System.out.println("Master : assegno l'esecuzione dell'app "+j.getId()+" al worker "+w.getId());
 						w.start(client, j, parameters);
+						MasterImp.inEsecuzione.put(w, info);
+						
 						check = false;
 					}
 					else {

@@ -11,4 +11,5 @@ import Client.ServerCallback;
 public interface WorkerServer extends Remote {
     void start(ServerCallback sc,Job j, Object parameters) throws RemoteException;
     int getId()throws RemoteException;
+    boolean isOn()throws RemoteException;
 }

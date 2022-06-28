@@ -71,13 +71,18 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 	}
 
 	public void start(ServerCallback sc, Job j, Object parameters) throws RemoteException {
-		System.out.println("Worker "+id+": Sto procedendo ad eseguire l'app "+j.getId());
+		
+		Executer executer = new Executer( sc, j, parameters,master,this,id);
+		executer.start();
+		
+		/*System.out.println("Worker "+id+": Sto procedendo ad eseguire l'app "+j.getId());
 		 Object result = j.run(parameters);
 		 int jID = j.getId();
 		 System.out.println("Worker "+id+" ho calcolato l'app "+jID+": "+result+" lo comunico al Master" );
-		 master.finishJob(sc,jID,result,this);
+		 master.finishJob(sc,jID,result,this);*/
 		 
 	}
+	
 	
 	public static void main(String[] args) throws IOException, NotBoundException {
 		 BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -127,4 +132,9 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 				}
 			}// while	 
 	 }
+	@Override
+	public boolean isOn() throws RemoteException {
+		// TODO Auto-generated method stub
+		return true;
+	}
 }
