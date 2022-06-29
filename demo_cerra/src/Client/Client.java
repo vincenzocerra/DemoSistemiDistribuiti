@@ -15,7 +15,7 @@ import Master.MasterServer;
 public class Client implements ServerCallback {
 	private MasterServer master;
 	int id;
-	int executeProgramCount;
+	private int executeProgramCount;
 	private int exportPort;
 	
 	public Client(String host, int port,int id, int executeProgramCount) throws RemoteException, NotBoundException {
@@ -33,15 +33,17 @@ public class Client implements ServerCallback {
 	
 	private void exportClass() throws RemoteException {
 		boolean export = false;
+		int c=0;
 		while(export!=true) {
-			int c=0;
 		try {
-			UnicastRemoteObject.exportObject(this,exportPort+c);
+			int port=exportPort+c;
+			UnicastRemoteObject.exportObject(this,port);
+			export = true;
 			}catch(ExportException e) {
 				System.out.println("Errore nell'export della classe");
 				c++;
+				continue;
 			}
-		export = true;
 		}	
 	}
 
