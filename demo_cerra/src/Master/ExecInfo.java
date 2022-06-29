@@ -4,6 +4,11 @@ import Client.ServerCallback;
 
 public class ExecInfo {
 	
+	@Override
+	public String toString() {
+		return "ExecInfo [sc=" + sc + ", j=" + j + ", parameters=" + parameters + "]";
+	}
+
 	public ServerCallback sc;
 	public Job j;
 	public Object parameters;

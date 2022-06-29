@@ -35,13 +35,13 @@ public class MasterThread extends Thread {
 					if (jobQueue.getFirst().equals(j)) {
 						w = availableWorker.get();
 						jobQueue.get();
+						MasterImp.inEsecuzione.put(w, info);
 						try {
 						System.out.println("Master: assegno l'esecuzione dell'app "+j.getId()+" al worker "+w.getId());
 						w.start(client, j, parameters);
 						}catch(Exception e){
 							master.handleBadDisconnection(w);
 						}
-						MasterImp.inEsecuzione.put(w, info);
 						
 						check = false;
 					}

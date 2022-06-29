@@ -95,6 +95,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		if(inEsecuzione.containsKey(w)) {
 			System.out.println("Master: Avvio procedura riassegnazione job");
 			ExecInfo info = inEsecuzione.get(w);
+			inEsecuzione.remove(w);
 			Job j = info.getJ();
 			executionQueue.put(j);
 			MasterThread gestoreTurno = new MasterThread(info,this);
@@ -136,10 +137,12 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	}
 	@Override
 	public void finishJob(ServerCallback sc,int iDJob, Object result, WorkerServer w, int wID) throws RemoteException {
+		inEsecuzione.remove(w);
 		availableWorkers.put(w);
 		System.out.println("Master: Il worker "+wID+" mi ha comunicato il risultato dell'app "+iDJob+": "+result+", lo inoltro al client "+sc.getId());
 		sc.getResult(iDJob,result);
-		System.out.println("Master: Applicazioni in coda: "+executionQueue.size());
+		System.out.println("Master: App in coda: "+executionQueue.size()+" App in esecuzione: "+inEsecuzione.size());
+		
 	}
 	
 	 public static void main(String[] args) throws IOException {
