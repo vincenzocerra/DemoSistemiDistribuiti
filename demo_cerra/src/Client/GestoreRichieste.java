@@ -28,7 +28,7 @@ public class GestoreRichieste extends Thread {
 			job = new JavaProgram();
 			job.setId(counter);
 			master.startRequest(c,job,1);
-			System.out.println("Client "+c.id+": ho richiesto l'esecuzione dell'app "+job.getId()+" al Master");
+			System.out.println("C"+c.id+"->M request "+job.getId());
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

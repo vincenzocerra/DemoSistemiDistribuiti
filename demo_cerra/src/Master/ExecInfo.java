@@ -7,12 +7,11 @@ public class ExecInfo {
 	public ServerCallback sc;
 	public Job j;
 	public Object parameters;
-	
+
 	public ExecInfo(ServerCallback sc, Job j, Object parameters) {
 		this.sc=sc;
 		this.j=j;
-		this.parameters=parameters;
-		
+		this.parameters=parameters;		
 	}
 
 	public ServerCallback getSc() {

@@ -15,15 +15,12 @@ import Master.MasterServer;
 public class Client implements ServerCallback {
 	private MasterServer master;
 	int id;
-	private int executeProgramCount;
 	private int exportPort;
 	
-	public Client(String host, int port,int id, int executeProgramCount) throws RemoteException, NotBoundException {
+	public Client(String host, int port, int id, int executeProgramCount) throws RemoteException, NotBoundException {
 		this.id=id;
-		this.executeProgramCount=executeProgramCount;
 		exportPort=1100;
-		
-		System.out.println("Client "+id+": Esecuzione avviata, inviera' "+executeProgramCount+ " richieste di esecuzione al Master"	);
+		System.out.println("C "+id+": Running - Request Count= "+executeProgramCount);
 		Registry registry = LocateRegistry.getRegistry(host, port);
 		exportClass();
 		master = (MasterServer) (registry.lookup("master"));
@@ -49,7 +46,7 @@ public class Client implements ServerCallback {
 
 	@Override
 	public void getResult(int idJob, Object result) throws RemoteException {
-		System.out.println("Client "+id+": il master mi ha comunicato il risultato dell'app "+idJob+" : " + result);
+		System.out.println("M->C"+id+" request: "+idJob+" result: " + result);
 	}
 	@Override
 	public void notifyInfo(String info) throws RemoteException {
@@ -105,8 +102,8 @@ public class Client implements ServerCallback {
 			 }
 			 try {
 				 for(int i = 0; i< client;i++) {
-					 
-					 new Client("127.0.0.1",port,i,3);
+					 int numProg=(int)(Math.random() * (5 - 1) + 1);
+					 new Client("127.0.0.1",port,i,numProg);
 					ok =true;
 				 }
 				} catch (RemoteException e) {

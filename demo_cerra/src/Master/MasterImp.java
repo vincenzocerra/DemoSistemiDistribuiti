@@ -21,7 +21,7 @@ import Worker.WorkerServer;
 
 public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	
-	 List<WorkerServer> workers;
+	List<WorkerServer> workers;
 	static SynchroListImp<Job> executionQueue;
 	static SynchroListImp<WorkerServer> availableWorkers;
 	static Map<WorkerServer, ExecInfo> inEsecuzione;
@@ -89,7 +89,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	synchronized void handleDisconnection(WorkerServer w) throws RemoteException {
+	synchronized void handleBadDisconnection(WorkerServer w) throws RemoteException {
 		availableWorkers.remove(w);
 		workers.remove(w);
 		if(inEsecuzione.containsKey(w)) {
@@ -105,20 +105,20 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	}
 	
 	@Override
-	public void connectWorker(WorkerServer w) throws RemoteException {
-		WorkerScanner ws= new WorkerScanner(w,this);
+	public void connectWorker(WorkerServer w, int id) throws RemoteException {
+		WorkerScanner ws= new WorkerScanner(w,id,this);
 		ws.start();
 		workers.add(w);
 		availableWorkers.put(w);
-		System.out.println("Master: Worker " + w.getId() + " connesso!");
+		System.out.println("Master: Worker " +id+ " connesso!");
 		System.out.println("Master: Attualmente sono disponibili: " + workers.size()+ " Worker");
 	}
 
 	@Override
-	public void disconnectWorker(WorkerServer w) throws RemoteException {
+	public void disconnectWorker(WorkerServer w,int id) throws RemoteException {
 		workers.remove(w);
 		availableWorkers.remove(w);
-		System.out.println("Master: Worker " +w.getId()+ " Disconnesso!");
+		System.out.println("Master: Worker " +id+ " Disconnesso!");
 		System.out.println("Master: Attualmente sono disponibili: " + workers.size()+ " Worker");
 	}
 
@@ -135,9 +135,9 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 
 	}
 	@Override
-	public void finishJob(ServerCallback sc,int iDJob, Object result, WorkerServer w) throws RemoteException {
+	public void finishJob(ServerCallback sc,int iDJob, Object result, WorkerServer w, int wID) throws RemoteException {
 		availableWorkers.put(w);
-		System.out.println("Master: Il worker "+w.getId()+" mi ha comunicato il risultato dell'app "+iDJob+": "+result+", lo inoltro al client "+sc.getId());
+		System.out.println("Master: Il worker "+wID+" mi ha comunicato il risultato dell'app "+iDJob+": "+result+", lo inoltro al client "+sc.getId());
 		sc.getResult(iDJob,result);
 		System.out.println("Master: Applicazioni in coda: "+executionQueue.size());
 	}

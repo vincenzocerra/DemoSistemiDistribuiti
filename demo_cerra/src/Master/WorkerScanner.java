@@ -7,13 +7,13 @@ public class WorkerScanner extends Thread {
 	
 	WorkerServer w;
 	MasterImp m;
-	int id;
+	int wId;
 	
 	
-	public WorkerScanner(WorkerServer w, MasterImp master) throws RemoteException {
+	public WorkerScanner(WorkerServer w, int wId, MasterImp master){
 		this.w=w;
 		this.m=master;
-		this.id = w.getId();
+		this.wId= wId;
 		
 	}
 	
@@ -23,9 +23,9 @@ public class WorkerScanner extends Thread {
 			try {
 				w.isOn();
 			} catch (RemoteException e) {
-				System.out.println("Master: Il Worker "+id+" ha improvvisamente smesso di funzionare");
+				System.out.println("Master: Il Worker "+wId+" ha improvvisamente smesso di funzionare");
 				try {
-					m.handleDisconnection(w);
+					m.handleBadDisconnection(w);
 					online=false;
 				} catch (RemoteException e1) {
 					// TODO Auto-generated catch block

@@ -33,7 +33,7 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 		try {
 			Registry registry = LocateRegistry.getRegistry(host, port);
 			master = (MasterServer) registry.lookup("master");
-			master.connectWorker(this);
+			master.connectWorker(this,id);
 
 		} catch (RemoteException e) {
 			System.out.println("Nessun Master Disponibile sulla porta selezionata");
@@ -52,7 +52,7 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 			try {
 				line = bReader.readLine();
 				if(line.equals("q") && line != null) {
-					master.disconnectWorker(this);
+					master.disconnectWorker(this,id);
 					running = false;
 					bReader.close();
 					System.out.println("Worker disconnesso!");
@@ -65,9 +65,6 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 		System.exit(-1);
 	}
 	
-	public int getId() {
-		return id;
-	}
 
 	public void start(ServerCallback sc, Job j, Object parameters) throws RemoteException {
 		
@@ -135,5 +132,10 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 	public boolean isOn() throws RemoteException {
 		// TODO Auto-generated method stub
 		return true;
+	}
+	@Override
+	public int getId() throws RemoteException {
+		// TODO Auto-generated method stub
+		return id;
 	}
 }

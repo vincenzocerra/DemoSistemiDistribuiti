@@ -39,8 +39,7 @@ public class MasterThread extends Thread {
 						System.out.println("Master: assegno l'esecuzione dell'app "+j.getId()+" al worker "+w.getId());
 						w.start(client, j, parameters);
 						}catch(Exception e){
-							System.out.println("ECCOOOOOOOOOOOOOO");
-							master.handleDisconnection(w);
+							master.handleBadDisconnection(w);
 						}
 						MasterImp.inEsecuzione.put(w, info);
 						

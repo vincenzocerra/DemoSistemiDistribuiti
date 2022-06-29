@@ -30,7 +30,7 @@ public class Executer extends Thread{
 		 int jID = j.getId();
 		 System.out.println("Worker "+id+" ho calcolato l'app "+jID+": "+result+" lo comunico al Master" );
 		 try {
-			master.finishJob(sc,jID,result,worker);
+			master.finishJob(sc,jID,result,worker,id);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
