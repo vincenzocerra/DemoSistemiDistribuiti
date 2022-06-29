@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 import Master.MasterServer;
 
 public class GestoreRichieste extends Thread {
-	ClientTest c;
+	Client c;
 	private Job job;
 	private MasterServer master;
 	private int richiesteCount;
@@ -14,7 +14,7 @@ public class GestoreRichieste extends Thread {
 	private int minSleep= 2000;
 	
 	
-	public GestoreRichieste(ClientTest c, MasterServer master, int richiesteCount) {
+	public GestoreRichieste(Client c, MasterServer master, int richiesteCount) {
 		check = true;
 		this.c = c;
 		this.master = master;

@@ -15,13 +15,14 @@ public class MasterThread extends Thread {
 	
 	private boolean check;
 	private ExecInfo info;
-
+	private MasterImp master;
 	
-	MasterThread(ExecInfo info){
+	MasterThread(ExecInfo info, MasterImp master){
 		check = true;
 		this.info=info;
 		this.client = info.getSc();
 		this.j =info.getJ();
+		this.master=master;
 		this.parameters=info.getParameters();
 		this.jobQueue = MasterImp.executionQueue;
 		this.availableWorker = MasterImp.availableWorkers;		
@@ -34,8 +35,13 @@ public class MasterThread extends Thread {
 					if (jobQueue.getFirst().equals(j)) {
 						w = availableWorker.get();
 						jobQueue.get();
-						System.out.println("Master : assegno l'esecuzione dell'app "+j.getId()+" al worker "+w.getId());
+						try {
+						System.out.println("Master: assegno l'esecuzione dell'app "+j.getId()+" al worker "+w.getId());
 						w.start(client, j, parameters);
+						}catch(Exception e){
+							System.out.println("ECCOOOOOOOOOOOOOO");
+							master.handleDisconnection(w);
+						}
 						MasterImp.inEsecuzione.put(w, info);
 						
 						check = false;

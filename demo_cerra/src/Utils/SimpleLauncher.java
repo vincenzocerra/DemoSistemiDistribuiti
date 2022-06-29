@@ -6,9 +6,6 @@ import java.io.InputStreamReader;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.HashMap;
-import java.util.LinkedList;
-
-import Client.ClientTest;
 import Master.MasterImp;
 import Worker.WorkerImp;
 
@@ -21,7 +18,6 @@ public class SimpleLauncher {
     	boolean running = true;
     	int masterNumber = 1 ;
     	HashMap<Integer,Integer> workerNumber = new HashMap<Integer,Integer>();
-    	String line;
     	System.out.println("CONSOLE");
 		System.out.println("Questo Launcher e' stato Creato per facilitare l'esecuzione di Master e Worker e Client");
 		BufferedReader bReader = new BufferedReader(new InputStreamReader(System.in));

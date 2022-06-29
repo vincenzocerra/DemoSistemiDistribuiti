@@ -9,9 +9,10 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import Client.Job;
@@ -20,7 +21,7 @@ import Worker.WorkerServer;
 
 public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	
-	protected static ArrayList<WorkerServer> workers;
+	 List<WorkerServer> workers;
 	static SynchroListImp<Job> executionQueue;
 	static SynchroListImp<WorkerServer> availableWorkers;
 	static Map<WorkerServer, ExecInfo> inEsecuzione;
@@ -36,14 +37,11 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		registry = LocateRegistry.createRegistry(port);
 		registry.rebind("master", this);
 		
-		workers = new ArrayList<WorkerServer>();
+		workers  = Collections.synchronizedList(new LinkedList<WorkerServer>());
 		availableWorkers = new SynchroListImp<WorkerServer>();
 		executionQueue = new SynchroListImp<Job>();
 		inEsecuzione = Collections.synchronizedMap(new HashMap<WorkerServer,ExecInfo>());
 		
-		WorkerScanner ws= new WorkerScanner(this);
-		ws.start();
-
 		try {
 			String addressString = (InetAddress.getLocalHost()).toString();
 			System.out.println("Il Master è in esecuzione su " + addressString + ", port: " + port);
@@ -90,27 +88,16 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
-	/*public Object execute(Job j, Object parameters) throws RemoteException {
-		//devo controllare se ci sono worker liberi
-		
-		System.out.println("E'stata richiesta l'esecuzione di un'applicazione");
-		System.out.println("Attualmente ci sono :"+ workers.size()+" Worker disponibili");
-
-		if(availableWorkers.size()>0) {
-			WorkerServer w = availableWorkers.remove(0);
-				return w.start( j, parameters);	
-		}
-		return -1;
-	}*/
 	
-	protected void handleDisconnection(WorkerServer w) throws RemoteException {
+	synchronized void handleDisconnection(WorkerServer w) throws RemoteException {
+		availableWorkers.remove(w);
 		workers.remove(w);
 		if(inEsecuzione.containsKey(w)) {
+			System.out.println("Master: Avvio procedura riassegnazione job");
 			ExecInfo info = inEsecuzione.get(w);
 			Job j = info.getJ();
 			executionQueue.put(j);
-			MasterThread gestoreTurno = new MasterThread(info);
+			MasterThread gestoreTurno = new MasterThread(info,this);
 			gestoreTurno.start();
 			
 		}
@@ -119,6 +106,8 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	
 	@Override
 	public void connectWorker(WorkerServer w) throws RemoteException {
+		WorkerScanner ws= new WorkerScanner(w,this);
+		ws.start();
 		workers.add(w);
 		availableWorkers.put(w);
 		System.out.println("Master: Worker " + w.getId() + " connesso!");
@@ -141,7 +130,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		
 		ExecInfo info = new ExecInfo(sc,j,parameters);
 		executionQueue.put(j);
-		MasterThread gestoreTurno = new MasterThread(info);
+		MasterThread gestoreTurno = new MasterThread(info,this);
 		gestoreTurno.start();
 
 	}
@@ -150,7 +139,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		availableWorkers.put(w);
 		System.out.println("Master: Il worker "+w.getId()+" mi ha comunicato il risultato dell'app "+iDJob+": "+result+", lo inoltro al client "+sc.getId());
 		sc.getResult(iDJob,result);
-		
+		System.out.println("Master: Applicazioni in coda: "+executionQueue.size());
 	}
 	
 	 public static void main(String[] args) throws IOException {

@@ -12,13 +12,13 @@ import java.rmi.server.UnicastRemoteObject;
 
 import Master.MasterServer;
 
-public class ClientTest implements ServerCallback {
+public class Client implements ServerCallback {
 	private MasterServer master;
 	int id;
 	int executeProgramCount;
 	private int exportPort;
 	
-	public ClientTest(String host, int port,int id, int executeProgramCount) throws RemoteException, NotBoundException {
+	public Client(String host, int port,int id, int executeProgramCount) throws RemoteException, NotBoundException {
 		this.id=id;
 		this.executeProgramCount=executeProgramCount;
 		exportPort=1100;
@@ -104,7 +104,7 @@ public class ClientTest implements ServerCallback {
 			 try {
 				 for(int i = 0; i< client;i++) {
 					 
-					 new ClientTest("127.0.0.1",port,i,3);
+					 new Client("127.0.0.1",port,i,3);
 					ok =true;
 				 }
 				} catch (RemoteException e) {

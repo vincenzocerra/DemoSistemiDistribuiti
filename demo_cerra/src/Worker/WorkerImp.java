@@ -11,7 +11,6 @@ import java.rmi.server.UnicastRemoteObject;
 
 import Client.Job;
 import Client.ServerCallback;
-import Master.MasterImp;
 import Master.MasterServer;
 
 public class WorkerImp extends UnicastRemoteObject implements WorkerServer{

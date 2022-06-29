@@ -1,43 +1,40 @@
 package Master;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import Worker.WorkerServer;
 
 public class WorkerScanner extends Thread {
 	
-	MasterImp master;
-	 ArrayList<WorkerServer> workers;
+	WorkerServer w;
+	MasterImp m;
+	int id;
 	
 	
-	public WorkerScanner( MasterImp master) {
-		this.master=master;
-		this.workers=master.workers;
+	public WorkerScanner(WorkerServer w, MasterImp master) throws RemoteException {
+		this.w=w;
+		this.m=master;
+		this.id = w.getId();
 		
 	}
 	
 	public void run() {
-		boolean allon=true;
-		while(allon) {
-			if(workers.size()>0) {
-				for(WorkerServer w: workers) {
-					try {
-						w.isOn();
-					} catch (RemoteException e) {
-						System.out.println("Un worker ha improvvisamente smesso di funzionare");
-						try {
-							master.handleDisconnection(w);
-						} catch (RemoteException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-						//riassegnazione del job
-					
-					}
+		boolean online=true;
+		while(online) {
+			try {
+				w.isOn();
+			} catch (RemoteException e) {
+				System.out.println("Master: Il Worker "+id+" ha improvvisamente smesso di funzionare");
+				try {
+					m.handleDisconnection(w);
+					online=false;
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
+	
 			}
 			try {
-				this.sleep(3000);
+				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
