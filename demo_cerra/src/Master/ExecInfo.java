@@ -1,5 +1,5 @@
 package Master;
-import Client.Job;
+import Client.ClientApp;
 import Client.ServerCallback;
 
 
@@ -16,10 +16,10 @@ public class ExecInfo {
 	
 
 	public ServerCallback sc;
-	public Job j;
+	public ClientApp j;
 	public Object parameters;
 
-	public ExecInfo(ServerCallback sc, Job j, Object parameters) {
+	public ExecInfo(ServerCallback sc, ClientApp j, Object parameters) {
 		this.sc=sc;
 		this.j=j;
 		this.parameters=parameters;		
@@ -45,7 +45,7 @@ public class ExecInfo {
 	 * @return	applicazione Java
 	 */
 
-	public Job getJ() {
+	public ClientApp getJ() {
 		return j;
 	}
 	/**
@@ -53,7 +53,7 @@ public class ExecInfo {
 	 * @param j
 	 */
 
-	public void setJ(Job j) {
+	public void setJ(ClientApp j) {
 		this.j = j;
 	}
 	

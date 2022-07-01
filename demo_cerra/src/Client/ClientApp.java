@@ -10,7 +10,7 @@ import java.io.Serializable;
  *
  */
 
-public interface Job extends Serializable {
+public interface ClientApp extends Serializable {
 	
 	/**
 	 * Metodo accessibile dal Master e dai Worker che consente di eseguire una generica applicazione java senza

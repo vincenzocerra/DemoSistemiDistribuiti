@@ -1,7 +1,7 @@
 package Worker;
 
 import java.rmi.RemoteException;
-import Client.Job;
+import Client.ClientApp;
 import Client.ServerCallback;
 import Master.MasterServer;
 
@@ -16,13 +16,13 @@ import Master.MasterServer;
 public class Executer extends Thread{
 	
 	private ServerCallback sc;
-	private Job j;
+	private ClientApp j;
 	private Object parameters;
 	private MasterServer master;
 	private WorkerServer worker;
 	private int id;
 	
-	public Executer(ServerCallback sc, Job j, Object parameters,MasterServer master,WorkerServer worker,int id) {
+	public Executer(ServerCallback sc, ClientApp j, Object parameters,MasterServer master,WorkerServer worker,int id) {
 		this.sc=sc;
 		this.j=j;
 		this.parameters=parameters;

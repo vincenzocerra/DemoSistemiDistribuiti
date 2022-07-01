@@ -13,7 +13,7 @@ import Master.MasterServer;
  */
 public class GestoreRichieste extends Thread {
 	Client c;
-	private Job job;
+	private ClientApp job;
 	private MasterServer master;
 	private int richiesteCount;
 	boolean check;

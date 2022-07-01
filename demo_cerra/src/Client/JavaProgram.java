@@ -9,7 +9,7 @@ package Client;
  *
  */
 
-public class JavaProgram implements Job {
+public class JavaProgram implements ClientApp {
 
 	private static final long serialVersionUID = 1L;
 	int id = 0;

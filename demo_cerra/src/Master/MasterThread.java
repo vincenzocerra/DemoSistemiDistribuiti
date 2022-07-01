@@ -1,6 +1,6 @@
 package Master;
 
-import Client.Job;
+import Client.ClientApp;
 import Client.ServerCallback;
 import Worker.WorkerServer;
 
@@ -14,9 +14,9 @@ import Worker.WorkerServer;
 public class MasterThread extends Thread {
 	
 	private ServerCallback client;
-	private Job j;
+	private ClientApp j;
 	private Object parameters;
-	private SynchroListImp<Job> jobQueue;
+	private SynchroListImp<ClientApp> jobQueue;
 	private SynchroListImp<WorkerServer> availableWorker;
 	private WorkerServer w;
 	

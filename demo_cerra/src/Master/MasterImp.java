@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import Client.Job;
+import Client.ClientApp;
 import Client.ServerCallback;
 import Worker.WorkerServer;
 
@@ -27,7 +27,7 @@ import Worker.WorkerServer;
 public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	
 	List<WorkerServer> workers;
-	SynchroListImp<Job> executionQueue;
+	SynchroListImp<ClientApp> executionQueue;
 	SynchroListImp<WorkerServer> availableWorkers;
 	Map<WorkerServer, ExecInfo> inEsecuzione;
 	private Registry registry;
@@ -44,7 +44,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		
 		workers  = Collections.synchronizedList(new LinkedList<WorkerServer>());
 		availableWorkers = new SynchroListImp<WorkerServer>();
-		executionQueue = new SynchroListImp<Job>();
+		executionQueue = new SynchroListImp<ClientApp>();
 		inEsecuzione = Collections.synchronizedMap(new HashMap<WorkerServer,ExecInfo>());
 		
 		try {
@@ -63,7 +63,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	
 	private void startConsole() {
 		System.out.println("CONSOLE");
-		System.out.println("Premi 'q' per uscire o 's' per verificare il numero di WORKER registrati");
+		System.out.println("Premi 'q' per uscire o 'i' per ottenere informazioni relative ai worker e alle applicazioni");
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		while (true) {
 			
@@ -75,8 +75,8 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 					if (lineString.equals("q")) {
 						System.out.println("Master disconnesso!");
 						break;
-					} else if (lineString.equals("s")) {
-						System.out.println("Il Master ha a disposizione " + workers.size() + " workers");
+					} else if (lineString.equals("i")) {
+						System.out.println("Worker Connessi: " + workers.size() + " | App in coda: "+executionQueue.size()+" | App in esecuzione: "+inEsecuzione.size());
 					}
 				}
 			} catch (IOException e) {
@@ -110,10 +110,10 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		availableWorkers.remove(w);
 		workers.remove(w);
 		if(inEsecuzione.containsKey(w)) {
-			System.out.println("Master: Avvio procedura riassegnazione applicazione");
+			System.out.println("Master: Avvio procedura riassegnazione applicazione Worker ");
 			ExecInfo info = inEsecuzione.get(w);
 			inEsecuzione.remove(w);
-			Job j = info.getJ();
+			ClientApp j = info.getJ();
 			executionQueue.put(j);
 			MasterThread gestoreTurno = new MasterThread(info,this);
 			gestoreTurno.start();
@@ -135,7 +135,6 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		workers.add(w);
 		availableWorkers.put(w);
 		System.out.println("Master: Worker " +id+ " connesso!");
-		System.out.println("Master: Attualmente sono disponibili: " + workers.size()+ " Worker");
 	}
 	
 	/**
@@ -158,7 +157,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	 */
 
 	@Override
-	public void startRequest(ServerCallback sc, Job j, Object parameters) throws RemoteException {
+	public void startRequest(ServerCallback sc, ClientApp j, Object parameters) throws RemoteException {
 		System.out.println("Master: ho ricevuto la richiesta di esecuzione dell'app "+j.getId()+" dal Client "+sc.getId());		
 		// qui tutto deve essere preso in carico da un thread 
 		// che verifichi che ci sia il worker disponibile, accodi le richieste e che avvii il medoto start di w 
@@ -179,9 +178,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		inEsecuzione.remove(w);
 		availableWorkers.put(w);
 		System.out.println("Master: Il worker "+wID+" mi ha comunicato il risultato dell'app "+iDJob+": "+result+", lo inoltro al client "+sc.getId());
-		sc.getResult(iDJob,result);
-		System.out.println("Master: App in coda: "+executionQueue.size()+" App in esecuzione: "+inEsecuzione.size());
-		
+		sc.getResult(iDJob,result);		
 	}
 	
 	 public static void main(String[] args) throws IOException {

@@ -2,7 +2,7 @@ package Master;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import Client.Job;
+import Client.ClientApp;
 import Client.ServerCallback;
 import Worker.WorkerServer;
 
@@ -22,7 +22,7 @@ public interface MasterServer extends Remote{
 	 * @param parameters parametri di input dell'applicazione
 	 * @throws RemoteException
 	 */
-	public void startRequest(ServerCallback sc,Job j, Object parameters) throws RemoteException;
+	public void startRequest(ServerCallback sc,ClientApp j, Object parameters) throws RemoteException;
 	
 	/**
 	 * Metodo utilizzato dal Worker per comunicare al Master il risultato ottenuto dalla simulazione dell'applicazione

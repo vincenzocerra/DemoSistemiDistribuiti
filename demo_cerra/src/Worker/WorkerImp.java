@@ -8,7 +8,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import Client.Job;
+import Client.ClientApp;
 import Client.ServerCallback;
 import Master.MasterServer;
 
@@ -67,7 +67,7 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 	private void startConsole() {
 		String line;
 		System.out.println("CONSOLE");
-		System.out.println("Digita  \"q\" per disconnetterti");
+		System.out.println("Digita  \"q\" per disconnetterti o  \"c\" per simulare un crash");
 		BufferedReader bReader = new BufferedReader(new InputStreamReader(System.in));
 		
 		while(running) {
@@ -77,7 +77,11 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 					master.disconnectWorker(this,id);
 					running = false;
 					bReader.close();
-					System.out.println("Worker disconnesso!");
+					System.out.println("Worker"+id+" disconnesso!");
+				}
+				if(line.equals("c") && line != null) {
+					System.out.println("Worker"+id+" Crash!");
+					System.exit(-1);
 				}
 			} catch (IOException e) {           
 				e.printStackTrace();
@@ -90,7 +94,7 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 	 * Implementazione del metodo dell'interfaccia che nello specifico delega tutta l'esecuzione del programma java ad un Thread
 	 */
 	
-	public void start(ServerCallback sc, Job j, Object parameters) throws RemoteException {
+	public void start(ServerCallback sc, ClientApp j, Object parameters) throws RemoteException {
 		
 		Executer executer = new Executer( sc, j, parameters,master,this,id);
 		executer.start();
