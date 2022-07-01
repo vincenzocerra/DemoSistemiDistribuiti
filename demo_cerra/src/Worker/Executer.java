@@ -1,10 +1,17 @@
 package Worker;
 
 import java.rmi.RemoteException;
-
 import Client.Job;
 import Client.ServerCallback;
 import Master.MasterServer;
+
+/**
+ * Questa classe si occupa della creazione di un Thread lato Worker. Ogni Thread ha il compito di invocare il metodo
+ * run dell'applicazione per esegurla seppure non conosce la sua reale implementazione.
+ * Una volta ottenuto il risultato, lo comunica al master invocando il metodo finishJob
+ * @author VincenzoCerra
+ *
+ */
 
 public class Executer extends Thread{
 	
@@ -33,7 +40,7 @@ public class Executer extends Thread{
 			master.finishJob(sc,jID,result,worker,id);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Worker "+id+" Master non disponibile" );
 		}
 		
 	}

@@ -4,13 +4,20 @@ import Client.Job;
 import Client.ServerCallback;
 import Worker.WorkerServer;
 
+/**
+ * Questa classe si occupa della creazione di un Thread lato Server. Ogni Thread ha il compito di associare un'applicazione
+ * ad un worker richiedendone l'esecuzione rispettando un ordine FIFO e gestendo eventuali problemi di comunicazione.
+ * @author VincenzoCerra
+ *
+ */
+
 public class MasterThread extends Thread {
 	
 	private ServerCallback client;
 	private Job j;
 	private Object parameters;
-	private SynchroList<Job> jobQueue;
-	private SynchroList<WorkerServer> availableWorker;
+	private SynchroListImp<Job> jobQueue;
+	private SynchroListImp<WorkerServer> availableWorker;
 	private WorkerServer w;
 	
 	private boolean check;
@@ -24,9 +31,13 @@ public class MasterThread extends Thread {
 		this.j =info.getJ();
 		this.master=master;
 		this.parameters=info.getParameters();
-		this.jobQueue = MasterImp.executionQueue;
-		this.availableWorker = MasterImp.availableWorkers;		
+		this.jobQueue = master.executionQueue;
+		this.availableWorker = master.availableWorkers;		
 	}
+	
+	/**
+	 * 
+	 */
 	
 	public void run()	{	
    		while (check) {
@@ -35,7 +46,7 @@ public class MasterThread extends Thread {
 					if (jobQueue.getFirst().equals(j)) {
 						w = availableWorker.get();
 						jobQueue.get();
-						MasterImp.inEsecuzione.put(w, info);
+						master.inEsecuzione.put(w, info);
 						try {
 						System.out.println("Master: assegno l'esecuzione dell'app "+j.getId()+" al worker "+w.getId());
 						w.start(client, j, parameters);

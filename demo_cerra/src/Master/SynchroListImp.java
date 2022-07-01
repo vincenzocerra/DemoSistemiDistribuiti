@@ -1,47 +1,58 @@
 package Master;
 
-import java.rmi.RemoteException;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class SynchroListImp<T> implements SynchroList<T> {
+/**
+ * Classe ausiliaria accessibile dal Master che serve a garantire sia una esecuzione FIFO delle applicazioni sia la consistenza in caso di accesso simultaneo sulle liste
+ * tramite l'utilizzo di una Queue Volatile e dell'implementazione dei metodi synchronized
+ * @author VincenzoCerra
+ *
+ * @param <T>
+ */
+
+public class SynchroListImp<T>{
 
 private volatile Queue<T> queue;
 	
-	public SynchroListImp() throws RemoteException{
-		// TODO Auto-generated constructor stub
+	public SynchroListImp() {
 		queue = new LinkedList<T>();
 	}
-	
-	/**
-	 * Use of lock-synchronization to keep consistency 
-	 */
-	
-	@Override
-	public synchronized void put(T t) throws RemoteException {
-		// TODO Auto-generated method stub
+
+/**
+ * Medoto synchronized che Inserisce in coda alla lista l'oggetto in ingresso
+ * @param t oggetto da inserire in coda
+ */
+	public synchronized void put(T t){
 		queue.offer(t);
 	}
-
-	@Override
-	public synchronized T get() throws RemoteException {
-		// TODO Auto-generated method stub
+/**
+ * Medoto synchronized che preleva dalla lista l'oggetto in testa
+ * @return oggetto in testa alla lista
+ */
+	public synchronized T get(){
 		return queue.poll();
 	}
-
-	@Override
-	public synchronized int size() throws RemoteException {
-		// TODO Auto-generated method stub
+/**
+ * Medoto synchronized che restituisce la dimensione della lista
+ * @return	dimensione della lista
+ */
+	public synchronized int size(){
 		return queue.size();
 	}
-	@Override
-	public synchronized void remove(T t) throws RemoteException {
-		// TODO Auto-generated method stub
+/**
+ * Medoto synchronized che rimuove dalla lista l'oggetto in ingresso
+ * @param t oggetto da rimuovere
+ */
+	public synchronized void remove(T t){
 		queue.remove(t);
 	}
-	@Override
-	public synchronized T getFirst() throws RemoteException {
-		// TODO Auto-generated method stub
+	
+/**
+ * Medoto synchronized che restituisce l'oggetto in testa senza rimuoverlo dalla lista
+ * @return oggetto in testa alla lista
+ */
+	public synchronized T getFirst(){
 		return queue.peek();
 	}
 

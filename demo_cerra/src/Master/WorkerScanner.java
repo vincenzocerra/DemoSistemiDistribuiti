@@ -3,6 +3,14 @@ package Master;
 import java.rmi.RemoteException;
 import Worker.WorkerServer;
 
+/**
+ * Questa classe si occupa della creazione di un Thread lato Server. Ogni Thread è strettamente collegato ad un worker, 
+ * ha infatti il compito di verificare che quest'ultimo sia attivo segnalando e gestendo eventuali problemi di connessione.
+ * di un worker
+ * @author VincenzoCerra
+ *
+ */
+
 public class WorkerScanner extends Thread {
 	
 	WorkerServer w;

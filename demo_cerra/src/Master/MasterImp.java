@@ -14,17 +14,22 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 import Client.Job;
 import Client.ServerCallback;
 import Worker.WorkerServer;
 
+/**
+ * 
+ * @author Vincenzo
+ *
+ */
+
 public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	
 	List<WorkerServer> workers;
-	static SynchroListImp<Job> executionQueue;
-	static SynchroListImp<WorkerServer> availableWorkers;
-	static Map<WorkerServer, ExecInfo> inEsecuzione;
+	SynchroListImp<Job> executionQueue;
+	SynchroListImp<WorkerServer> availableWorkers;
+	Map<WorkerServer, ExecInfo> inEsecuzione;
 	private Registry registry;
 	private String lineString;
 
@@ -46,13 +51,17 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 			String addressString = (InetAddress.getLocalHost()).toString();
 			System.out.println("Il Master è in esecuzione su " + addressString + ", port: " + port);
 		} catch (UnknownHostException e) {
-			// TODO: handle exception
 			e.printStackTrace();
 		}
 		
 	}
+	/**
+	* Metodo privato utilizzato per migliorare l'esperienza utente. Viene invocato solo nel caso di esecuzione singola del Master
+	* e consente di verificare il numero dei worker o disconnettersi. Tale dinamicità è possibile
+	* grazie ad un'implementazione non bloccante dei metodi.
+	*/
 	
-	public void startConsole() {
+	private void startConsole() {
 		System.out.println("CONSOLE");
 		System.out.println("Premi 'q' per uscire o 's' per verificare il numero di WORKER registrati");
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -89,11 +98,19 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	/**
+	 * Metodo Synchronized utilizzato per gestire eventuali disconnessioni dei Worker. Nel caso in cui il Worker disconnesso aveva
+	 * preso in carico l'esecuzione di un'applicazione senza ancora produrre risultato, verrà avviata la procedura di riassegnamento
+	 * del job ad un altro worker.
+	 * @param w	Worker disconnesso
+	 * @throws RemoteException
+	 */
+	
 	synchronized void handleBadDisconnection(WorkerServer w) throws RemoteException {
 		availableWorkers.remove(w);
 		workers.remove(w);
 		if(inEsecuzione.containsKey(w)) {
-			System.out.println("Master: Avvio procedura riassegnazione job");
+			System.out.println("Master: Avvio procedura riassegnazione applicazione");
 			ExecInfo info = inEsecuzione.get(w);
 			inEsecuzione.remove(w);
 			Job j = info.getJ();
@@ -105,6 +122,12 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		
 	}
 	
+	/**
+	 * Implementazione del metodo presente nell'interfaccia del Master che serve a registrare un nuovo Worker
+	 * la registrazione avviene attraverso l'aggiunta del Worker a 2 liste e l'avvio di un Thread per il monitoraggio 
+	 * dell'effettiva disponibilità del Worker.
+	 */
+	
 	@Override
 	public void connectWorker(WorkerServer w, int id) throws RemoteException {
 		WorkerScanner ws= new WorkerScanner(w,id,this);
@@ -114,6 +137,11 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		System.out.println("Master: Worker " +id+ " connesso!");
 		System.out.println("Master: Attualmente sono disponibili: " + workers.size()+ " Worker");
 	}
+	
+	/**
+	 * Implementazione del metodo presente nell'interfaccia del Master che serve a disconnettere in maniera Controllata
+	 * un Worker.
+	 */
 
 	@Override
 	public void disconnectWorker(WorkerServer w,int id) throws RemoteException {
@@ -122,6 +150,12 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		System.out.println("Master: Worker " +id+ " Disconnesso!");
 		System.out.println("Master: Attualmente sono disponibili: " + workers.size()+ " Worker");
 	}
+	
+	/**
+	 * Implementazione del metodo presente nell'interfaccia. Tale metodo viene utilizzato dai client per richiedere una
+	 * nuova richiesta di esecuzione di un'applicazione. Tale metodo delegherà ogni richiesta ricevuta ad un nuovo MasterThread
+	 * che procederà a gestirla.
+	 */
 
 	@Override
 	public void startRequest(ServerCallback sc, Job j, Object parameters) throws RemoteException {
@@ -135,6 +169,11 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		gestoreTurno.start();
 
 	}
+	
+	/**
+	 * Metodo presente nell'interfaccia che può essere invocato da un Worker per comunicare la risoluzione dell'applicazione assegnata.
+	 * L'implementazione prevede che il Master, una volta ottenuti i risultati, procederà ad invocare la callback sul client inoltrando i risultati.
+	 */
 	@Override
 	public void finishJob(ServerCallback sc,int iDJob, Object result, WorkerServer w, int wID) throws RemoteException {
 		inEsecuzione.remove(w);

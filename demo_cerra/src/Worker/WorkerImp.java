@@ -8,10 +8,17 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-
 import Client.Job;
 import Client.ServerCallback;
 import Master.MasterServer;
+
+/**
+ * Questa Classe gestisce la creazione del Worker, la connessione con il Master 
+ * e la corretta esecuzione dell'applicazione JAVA Client comunicatagli dal Master. Implementa l'interfaccia WorkerServer
+ * definendo nel dettaglio le specifiche dei metodi accessibili da remoto.
+ * @author VincenzoCerra
+ *
+ */
 
 public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 	
@@ -23,6 +30,15 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 	private MasterServer master;
 	private boolean running = true;
 	int id;
+	
+	/**
+	 * Costruttore di un Worker
+	 * @param host indirizzo host
+	 * @param port porta del registro
+	 * @param id intero identificativo
+	 * @throws RemoteException
+	 * @throws NotBoundException
+	 */
 
 	public WorkerImp(String host, int port, int id) throws RemoteException, NotBoundException {
 		super();
@@ -42,7 +58,13 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 		System.out.println("Connessione avvenuta con Successo");
 		
 	}
-	public void startConsole() {
+	
+	/**
+	* Metodo privato utilizzato per migliorare l'esperienza utente. Viene invocato solo nel caso di esecuzione singola del Worker
+	* e consente di disconnettere il worker in maniera controllata anche durante l'esecuzione di un'applicazione. Tale dinamicità è possibile
+	* grazie ad un'implementazione non bloccante dei metodi.
+	*/
+	private void startConsole() {
 		String line;
 		System.out.println("CONSOLE");
 		System.out.println("Digita  \"q\" per disconnetterti");
@@ -57,25 +79,21 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 					bReader.close();
 					System.out.println("Worker disconnesso!");
 				}
-			} catch (IOException e) {
-				// TODO: handle exception
+			} catch (IOException e) {           
 				e.printStackTrace();
 			}
 		}
 		System.exit(-1);
 	}
 	
-
+	/**
+	 * Implementazione del metodo dell'interfaccia che nello specifico delega tutta l'esecuzione del programma java ad un Thread
+	 */
+	
 	public void start(ServerCallback sc, Job j, Object parameters) throws RemoteException {
 		
 		Executer executer = new Executer( sc, j, parameters,master,this,id);
 		executer.start();
-		
-		/*System.out.println("Worker "+id+": Sto procedendo ad eseguire l'app "+j.getId());
-		 Object result = j.run(parameters);
-		 int jID = j.getId();
-		 System.out.println("Worker "+id+" ho calcolato l'app "+jID+": "+result+" lo comunico al Master" );
-		 master.finishJob(sc,jID,result,this);*/
 		 
 	}
 	
@@ -130,12 +148,10 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 	 }
 	@Override
 	public boolean isOn() throws RemoteException {
-		// TODO Auto-generated method stub
 		return true;
 	}
 	@Override
 	public int getId() throws RemoteException {
-		// TODO Auto-generated method stub
 		return id;
 	}
 }
