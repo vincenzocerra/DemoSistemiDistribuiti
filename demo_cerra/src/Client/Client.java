@@ -25,15 +25,19 @@ public class Client implements ServerCallback {
 	int id;
 	private int exportPort;
 	
-	public Client(String host, int port, int id, int executeProgramCount) throws RemoteException, NotBoundException {
+	public Client(String host, int port, int id) throws RemoteException, NotBoundException {
 		this.id=id;
 		exportPort=1100;
-		System.out.println("C "+id+": Running - Request Count= "+executeProgramCount);
+		System.out.println("C "+id+": Running");
 		Registry registry = LocateRegistry.getRegistry(host, port);
 		exportClass();
 		master = (MasterServer) (registry.lookup("master"));
-		GestoreRichieste gestore = new GestoreRichieste(this,master,executeProgramCount);
-		gestore.start();
+	}
+	
+	private void startRandomRequest(int executeProgramCount) {
+		System.out.println("C "+id+"- Request Count= "+executeProgramCount);
+		GestoreRichiesteRandom gestoreRandom = new GestoreRichiesteRandom(this,master,executeProgramCount);
+		gestoreRandom.start();
 	}
 	
 	
@@ -54,7 +58,7 @@ public class Client implements ServerCallback {
 			UnicastRemoteObject.exportObject(this,port);
 			export = true;
 			}catch(ExportException e) {
-				System.out.println("Errore nell'export della classe");
+				//System.out.println("Errore nell'export della classe");
 				c++;
 				continue;
 			}
@@ -110,7 +114,11 @@ public class Client implements ServerCallback {
 	private void startConsole() {
 		String line;
 		System.out.println("CONSOLE");
-		System.out.println("Digita  \"e\" per mandare una nuova richiesta");
+		System.out.println("Digita  \"s\" per visualizzare le applicazioni Server disponibili");
+		System.out.println("Digita \"numero del servizio\" per richiedere l'esecuzione dell'applicazione Server");
+		System.out.println("Digita  \"r\" per richiede l'esecuzione di una applicazione Client");
+		System.out.println("Digita  \"q\" per disconnetterti");
+
 		BufferedReader bReader = new BufferedReader(new InputStreamReader(System.in));
 		boolean running = true;
 		
@@ -122,10 +130,26 @@ public class Client implements ServerCallback {
 					bReader.close();
 					System.out.println("Client disconnesso!");
 				}
-				else if(line.equals("e") && line != null) {
-					GestoreRichieste gr = new GestoreRichieste(this,master,1);
-					gr.start();
+				else if(line.equals("s") && line != null) {
+					System.out.println(master.service());
 				}
+				else if(line.equals("r") && line != null) {
+					GestoreRichiesta gestore = new GestoreRichiesta(this,master);
+					gestore.start();
+					
+				}
+				else {
+				int idService = -1;
+					try {
+						idService = Integer.parseInt(line);
+					}catch(NumberFormatException e) {
+						System.out.println("Comando non riconosciuto");
+						continue;
+					}
+					GestoreRichiesta gestore = new GestoreRichiesta(this,master,idService);
+					gestore.start();
+				}
+				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -142,7 +166,7 @@ public class Client implements ServerCallback {
 		 int scelta=0;
 		 int client=1;
 		 while (ok != true) {
-			 System.out.println("Esecuzione Singola (1) o Esecuzione Multipla (2)");
+			 System.out.println("Esecuzione Singola da Terminale (1) o Esecuzione Multipla Randomica (2)");
 			 try {
 					scelta = Integer.parseInt(br.readLine());
 				}catch(NumberFormatException e) {
@@ -160,7 +184,7 @@ public class Client implements ServerCallback {
 			 try {
 					port = Integer.parseInt(br.readLine());
 				}catch(NumberFormatException e) {
-					System.out.println("Bisogna inserire un numero compreso tra !");
+					System.out.println("Bisogna inserire un numero di porta corretto");
 					continue;
 				}
 			 if(scelta ==2) {
@@ -173,12 +197,19 @@ public class Client implements ServerCallback {
 				}
 			 }
 			 try {
-				 for(int i = 0; i< client;i++) {
-					 int numProg=(int)(Math.random() * (5 - 1) + 1);
-					 Client cl=new Client("127.0.0.1",port,i,numProg);
-					 if(scelta==1)cl.startConsole();
-					ok =true;
+				 if(scelta == 2) {
+					 for(int i = 0; i< client;i++) {
+						 int numProg=(int)(Math.random() * (5 - 1) + 1);
+						 Client cl=new Client("127.0.0.1",port,i);
+						 cl.startRandomRequest(numProg);
+					 }
 				 }
+				 else if(scelta==1) {
+					Client cl=new Client("127.0.0.1",port,1);
+					cl.startConsole();
+					
+				 }
+				ok =true;
 				} catch (RemoteException e) {
 					System.out.println("Nessun Master connesso a questa porta");
 					ok =false;

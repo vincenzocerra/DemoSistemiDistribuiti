@@ -16,13 +16,15 @@ public class ExecInfo {
 	
 
 	public ServerCallback sc;
-	public ClientApp j;
+	public Object j;
 	public Object parameters;
+	public int t;
 
-	public ExecInfo(ServerCallback sc, ClientApp j, Object parameters) {
+	public ExecInfo(ServerCallback sc, Object j, Object parameters, int type) {
 		this.sc=sc;
 		this.j=j;
 		this.parameters=parameters;		
+		this.t=type;
 	}
 	/**
 	 * Metodo di servizio per ottere il riferimento al Client
@@ -45,7 +47,7 @@ public class ExecInfo {
 	 * @return	applicazione Java
 	 */
 
-	public ClientApp getJ() {
+	public Object getJ() {
 		return j;
 	}
 	/**
@@ -82,6 +84,10 @@ public class ExecInfo {
 	@Override
 	public String toString() {
 		return "ExecInfo [Client=" + sc + ", App=" + j + ", parameters=" + parameters + "]";
+	}
+	
+	public int getType() {
+		return t;
 	}
 	
 

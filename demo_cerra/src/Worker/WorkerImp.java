@@ -8,7 +8,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import Client.ClientApp;
 import Client.ServerCallback;
 import Master.MasterServer;
 
@@ -94,9 +93,9 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 	 * Implementazione del metodo dell'interfaccia che nello specifico delega tutta l'esecuzione del programma java ad un Thread
 	 */
 	
-	public void start(ServerCallback sc, ClientApp j, Object parameters) throws RemoteException {
+	public void start(ServerCallback sc, Object j, Object parameters, int type) throws RemoteException {
 		
-		Executer executer = new Executer( sc, j, parameters,master,this,id);
+		Executer executer = new Executer( sc, j, parameters,master,this,id, type);
 		executer.start();
 		 
 	}

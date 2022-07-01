@@ -14,22 +14,30 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
+
 import Client.ClientApp;
 import Client.ServerCallback;
 import Worker.WorkerServer;
 
 /**
- * 
+ * Questa Classe gestisce la creazione del Master, la connessione con i Client e con i worker, 
+ * l'assegnamento dell'esecuzione delle applicazioni ai worker e la comunicazione dei risultati ai client.
+ * Implementa l'interfaccia MasterServer definendo nel dettaglio le specifiche dei metodi accessibili da remoto.
  * @author Vincenzo
  *
  */
 
 public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	
+	BlockingQueue <WorkerServer>availableWorkers2;
 	List<WorkerServer> workers;
-	SynchroListImp<ClientApp> executionQueue;
-	SynchroListImp<WorkerServer> availableWorkers;
 	Map<WorkerServer, ExecInfo> inEsecuzione;
+
+	
+	LinkedList<ServerProgram> serverProg;
 	private Registry registry;
 	private String lineString;
 
@@ -39,14 +47,18 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		System.out.println("Avvio Master");		
 		//aggiorno le informazioni di registro
 		
+		serverProg = new LinkedList<ServerProgram>();
+		serverProg.add(new ServerJavaProgram0());
+		serverProg.add(new ServerJavaProgram1());
+		serverProg.add(new ServerJavaProgram2());
+
+		
 		registry = LocateRegistry.createRegistry(port);
 		registry.rebind("master", this);
-		
 		workers  = Collections.synchronizedList(new LinkedList<WorkerServer>());
-		availableWorkers = new SynchroListImp<WorkerServer>();
-		executionQueue = new SynchroListImp<ClientApp>();
+		availableWorkers2 = new LinkedBlockingQueue<WorkerServer>(2048);
 		inEsecuzione = Collections.synchronizedMap(new HashMap<WorkerServer,ExecInfo>());
-		
+				
 		try {
 			String addressString = (InetAddress.getLocalHost()).toString();
 			System.out.println("Il Master è in esecuzione su " + addressString + ", port: " + port);
@@ -55,11 +67,13 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		}
 		
 	}
+	
 	/**
 	* Metodo privato utilizzato per migliorare l'esperienza utente. Viene invocato solo nel caso di esecuzione singola del Master
 	* e consente di verificare il numero dei worker o disconnettersi. Tale dinamicità è possibile
 	* grazie ad un'implementazione non bloccante dei metodi.
 	*/
+	
 	
 	private void startConsole() {
 		System.out.println("CONSOLE");
@@ -76,7 +90,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 						System.out.println("Master disconnesso!");
 						break;
 					} else if (lineString.equals("i")) {
-						System.out.println("Worker Connessi: " + workers.size() + " | App in coda: "+executionQueue.size()+" | App in esecuzione: "+inEsecuzione.size());
+						System.out.println("Worker Connessi: " + workers.size() + " | App in esecuzione: "+inEsecuzione.size());
 					}
 				}
 			} catch (IOException e) {
@@ -107,14 +121,12 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	 */
 	
 	synchronized void handleBadDisconnection(WorkerServer w) throws RemoteException {
-		availableWorkers.remove(w);
+		availableWorkers2.remove(w);
 		workers.remove(w);
 		if(inEsecuzione.containsKey(w)) {
 			System.out.println("Master: Avvio procedura riassegnazione applicazione Worker ");
 			ExecInfo info = inEsecuzione.get(w);
 			inEsecuzione.remove(w);
-			ClientApp j = info.getJ();
-			executionQueue.put(j);
 			MasterThread gestoreTurno = new MasterThread(info,this);
 			gestoreTurno.start();
 			
@@ -133,7 +145,12 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		WorkerScanner ws= new WorkerScanner(w,id,this);
 		ws.start();
 		workers.add(w);
-		availableWorkers.put(w);
+		try {
+			availableWorkers2.put(w);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.println("Master: Worker " +id+ " connesso!");
 	}
 	
@@ -145,9 +162,17 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	@Override
 	public void disconnectWorker(WorkerServer w,int id) throws RemoteException {
 		workers.remove(w);
-		availableWorkers.remove(w);
+		availableWorkers2.remove(w);
 		System.out.println("Master: Worker " +id+ " Disconnesso!");
 		System.out.println("Master: Attualmente sono disponibili: " + workers.size()+ " Worker");
+		if(inEsecuzione.containsKey(w)) {
+			System.out.println("Master: Avvio procedura riassegnazione applicazione Worker ");
+			ExecInfo info = inEsecuzione.get(w);
+			inEsecuzione.remove(w);
+			MasterThread gestoreTurno = new MasterThread(info,this);
+			gestoreTurno.start();
+			
+		}
 	}
 	
 	/**
@@ -158,14 +183,28 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 
 	@Override
 	public void startRequest(ServerCallback sc, ClientApp j, Object parameters) throws RemoteException {
-		System.out.println("Master: ho ricevuto la richiesta di esecuzione dell'app "+j.getId()+" dal Client "+sc.getId());		
+		//System.out.println("Master: ho ricevuto la richiesta di esecuzione dell'app "+j.getId()+" dal Client "+sc.getId());		
 		// qui tutto deve essere preso in carico da un thread 
 		// che verifichi che ci sia il worker disponibile, accodi le richieste e che avvii il medoto start di w 
-		
-		ExecInfo info = new ExecInfo(sc,j,parameters);
-		executionQueue.put(j);
+		Object app = j;
+		int type = 0;
+		ExecInfo info = new ExecInfo(sc,app,parameters,type);
 		MasterThread gestoreTurno = new MasterThread(info,this);
 		gestoreTurno.start();
+
+	}
+	
+	@Override
+	public void startRequest2(ServerCallback sc, int programma, Object parameters) throws RemoteException {
+		System.out.println("Master: ho ricevuto la richiesta di esecuzione dell'app Server "+programma+" dal Client "+sc.getId());		
+		if (programma <0 || programma > serverProg.size()-1)sc.getResult(programma,"Programma non esistente");
+		else{
+			Object app = serverProg.get(programma);
+			int type = 1;
+			ExecInfo info = new ExecInfo(sc,app,parameters,type);
+			MasterThread gestoreTurno = new MasterThread(info,this);
+			gestoreTurno.start();
+		}
 
 	}
 	
@@ -176,8 +215,13 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	@Override
 	public void finishJob(ServerCallback sc,int iDJob, Object result, WorkerServer w, int wID) throws RemoteException {
 		inEsecuzione.remove(w);
-		availableWorkers.put(w);
-		System.out.println("Master: Il worker "+wID+" mi ha comunicato il risultato dell'app "+iDJob+": "+result+", lo inoltro al client "+sc.getId());
+		try {
+			availableWorkers2.put(w);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//System.out.println("Master: Il worker "+wID+" mi ha comunicato il risultato dell'app "+iDJob+": "+result+", lo inoltro al client "+sc.getId());
 		sc.getResult(iDJob,result);		
 	}
 	
@@ -204,6 +248,14 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 				}
 			}// while	 
 	 }
+	@Override
+	public String service() throws RemoteException {
+		String services ="";
+		for (ServerProgram sp : serverProg) {
+			services+= sp.getId()+ " - ";
+		}
+		return services;
+	}
 	
 
 }

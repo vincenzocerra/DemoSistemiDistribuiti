@@ -22,7 +22,7 @@ public interface MasterServer extends Remote{
 	 * @param parameters parametri di input dell'applicazione
 	 * @throws RemoteException
 	 */
-	public void startRequest(ServerCallback sc,ClientApp j, Object parameters) throws RemoteException;
+	public void startRequest(ServerCallback sc, ClientApp j, Object parameters) throws RemoteException;
 	
 	/**
 	 * Metodo utilizzato dal Worker per comunicare al Master il risultato ottenuto dalla simulazione dell'applicazione
@@ -51,4 +51,15 @@ public interface MasterServer extends Remote{
 	 */
 	
 	public void disconnectWorker(WorkerServer w, int id) throws RemoteException;
+	
+	/**
+	 * Metodo che viene utilizzato dal Client per richiedere al Master l'esecuzione di un'applicazione java
+	 * @param sc riferimento al client per la callback
+	 * @param j	applicazione Java da eseguire
+	 * @param parameters parametri di input dell'applicazione
+	 * @throws RemoteException
+	 */
+	public void startRequest2(ServerCallback sc, int programma, Object parameters) throws RemoteException;
+	
+	public String service()throws RemoteException;
 }

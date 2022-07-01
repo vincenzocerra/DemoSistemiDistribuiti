@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 import Client.ClientApp;
 import Client.ServerCallback;
 import Master.MasterServer;
+import Master.ServerProgram;
 
 /**
  * Questa classe si occupa della creazione di un Thread lato Worker. Ogni Thread ha il compito di invocare il metodo
@@ -16,31 +17,49 @@ import Master.MasterServer;
 public class Executer extends Thread{
 	
 	private ServerCallback sc;
-	private ClientApp j;
+	private Object j;
 	private Object parameters;
 	private MasterServer master;
 	private WorkerServer worker;
 	private int id;
+	private int type;
 	
-	public Executer(ServerCallback sc, ClientApp j, Object parameters,MasterServer master,WorkerServer worker,int id) {
+	public Executer(ServerCallback sc, Object j, Object parameters,MasterServer master,WorkerServer worker,int id, int type) {
 		this.sc=sc;
 		this.j=j;
 		this.parameters=parameters;
 		this.master=master;
 		this.worker=worker;
 		this.id=id;
+		this.type=type;
 	}
 	
 	public void run() {
-		System.out.println("Worker "+id+": Sto procedendo ad eseguire l'app "+j.getId());
-		 Object result = j.run(parameters);
-		 int jID = j.getId();
-		 System.out.println("Worker "+id+" ho calcolato l'app "+jID+": "+result+" lo comunico al Master" );
-		 try {
-			master.finishJob(sc,jID,result,worker,id);
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			System.out.println("Worker "+id+" Master non disponibile" );
+		if (type == 0) {
+			ClientApp app = (ClientApp) j;
+			System.out.println("Worker "+id+": Sto procedendo ad eseguire l'app Client"+app.getId());
+			 Object result = app.run(parameters);
+			 int jID = app.getId();
+			 System.out.println("Worker "+id+" ho calcolato l'app "+jID+": "+result+" lo comunico al Master" );
+			 try {
+				master.finishJob(sc,jID,result,worker,id);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				System.out.println("Worker "+id+" Master non disponibile" );
+			}
+		}
+		else{
+			ServerProgram app = (ServerProgram) j;
+			System.out.println("Worker "+id+": Sto procedendo ad eseguire l'app Server "+app.getId());
+			 Object result = app.run(parameters);
+			 int jID = app.getId();
+			 System.out.println("Worker "+id+" ho calcolato l'app "+jID+": "+result+" lo comunico al Master" );
+			 try {
+				master.finishJob(sc,jID,result,worker,id);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				System.out.println("Worker "+id+" Master non disponibile" );
+			}
 		}
 		
 	}

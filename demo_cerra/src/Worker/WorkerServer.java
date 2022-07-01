@@ -2,7 +2,6 @@ package Worker;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import Client.ClientApp;
 import Client.ServerCallback;
 
 /**
@@ -19,7 +18,7 @@ public interface WorkerServer extends Remote {
 	 * @param parameters paramentri dell'applicazione
 	 * @throws RemoteException
 	 */
-    void start(ServerCallback sc,ClientApp j, Object parameters) throws RemoteException;
+    void start(ServerCallback sc, Object j, Object parameters,int type) throws RemoteException;
     /**
      * Metodo utilizzato per ottenere l'id del worker
      * @return id del worker
