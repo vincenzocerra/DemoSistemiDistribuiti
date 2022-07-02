@@ -12,22 +12,23 @@ import Client.ServerCallback;
 
 public interface WorkerServer extends Remote {	
 	/** 
-	 * Metodo utilizzato dal Master per richiedere al Worker di eseguire il programma java comunicato dal Client
+	 * Metodo utilizzato dal Master per richiedere al Worker di eseguire un programma Java
 	 * @param sc riferimento all'interfaccia del Client
-	 * @param j riferimento all'applicazione Client java
+	 * @param j riferimento all'applicazione java
 	 * @param parameters paramentri dell'applicazione
-	 * @throws RemoteException
+	 * @param type indica la tipologia dell'applicazione (Server o Client)
+	 * @throws RemoteException remote exception
 	 */
-    void start(ServerCallback sc, Object j, Object parameters,int type) throws RemoteException;
+    void execute(ServerCallback sc, Object j, Object parameters,int type) throws RemoteException;
     /**
      * Metodo utilizzato per ottenere l'id del worker
      * @return id del worker
-     * @throws RemoteException 
+     * @throws RemoteException remote exception
      */
     
     int getId()throws RemoteException;
     /**
-     * Metodo utilizzato per capire se il Worker è online o offline
+     * Metodo utilizzato per capire se il Worker è online o offline dal Master
      * @return restituisce True se il Worker è online
      * @throws RemoteException Se generata indica che c è un problema di connessione con il Worker
      */

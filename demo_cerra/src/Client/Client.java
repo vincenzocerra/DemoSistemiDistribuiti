@@ -34,6 +34,11 @@ public class Client implements ServerCallback {
 		master = (MasterServer) (registry.lookup("master"));
 	}
 	
+	/**
+	 * Metodo privato che serve a Randomizzare la tipologia e la temporizzazione delle richieste di esecuzione
+	 * @param executeProgramCount	numero di richieste di esecuzione da effettuare
+	 */
+	
 	private void startRandomRequest(int executeProgramCount) {
 		System.out.println("C "+id+"- Request Count= "+executeProgramCount);
 		GestoreRichiesteRandom gestoreRandom = new GestoreRichiesteRandom(this,master,executeProgramCount);
@@ -43,8 +48,8 @@ public class Client implements ServerCallback {
 	
 	/**
 	* Metodo privato utilizzato dal client per esportare la classe tramite UnicastRemoteObject.
-	* Si è deciso di utilizzare questo meccanismo per non vincolare il Client ad estendere la classe Remote.
-	* Inoltre è stata gestita la possibilità di avviare più esecuzioni della classe gestendo la porta utilizzata per l'export
+	* Si è deciso di utilizzare questo meccanismo per non vincolare il Client ad estendere la classe UnicastRemoteObject.
+	* Inoltre è stata gestita la possibilità di avviare più esecuzioni della classe garantendo l'utilizzo di una porta libera per l'export
 	* 
 	* @exception ExportException se la porta è già occupata.
 	*/
@@ -107,7 +112,7 @@ public class Client implements ServerCallback {
 	
 	/**
 	* Metodo privato utilizzato per migliorare l'esperienza utente. Viene invocato solo nel caso di esecuzione singola del Client
-	* e consente di richiedere l'invio di una nuova richiesta di esecuzione o di disconnettere il client. Tale dinamicità è possibile
+	* e consente di pilotare l'esecuzione del client a proprio piacimento. Tale dinamicità è possibile
 	* grazie all'implementazione non bloccante delle richieste client.
 	*/
 	
@@ -131,7 +136,7 @@ public class Client implements ServerCallback {
 					System.out.println("Client disconnesso!");
 				}
 				else if(line.equals("s") && line != null) {
-					System.out.println(master.service());
+					System.out.println(master.getService());
 				}
 				else if(line.equals("r") && line != null) {
 					GestoreRichiesta gestore = new GestoreRichiesta(this,master);

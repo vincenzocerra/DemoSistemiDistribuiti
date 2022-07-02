@@ -39,7 +39,7 @@ public class GestoreRichiesteRandom extends Thread {
 				try {
 					job = new JavaProgram();
 					job.setId(counter);
-					master.startRequest(c,job,"parameters");
+					master.execClientApp(c,job,"parameters");
 					System.out.println("C"+c.id+"->M request Client APP "+job.getId());
 				} catch (RemoteException e) {
 					e.printStackTrace();
@@ -54,7 +54,7 @@ public class GestoreRichiesteRandom extends Thread {
 			else {
 				int service=(int)(Math.random() * (3 - 0) + 0);
 				try {
-					master.startRequest2(c,service,"parameters");
+					master.execServerApp(c,service,"parameters");
 					System.out.println("C"+c.id+"->M request Server APP "+service);
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block

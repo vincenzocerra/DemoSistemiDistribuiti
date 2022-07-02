@@ -37,10 +37,10 @@ public class Executer extends Thread{
 	public void run() {
 		if (type == 0) {
 			ClientApp app = (ClientApp) j;
-			System.out.println("Worker "+id+": Sto procedendo ad eseguire l'app Client"+app.getId());
+			System.out.println("W"+id+" start ClientApp execution ....");
 			 Object result = app.run(parameters);
 			 int jID = app.getId();
-			 System.out.println("Worker "+id+" ho calcolato l'app "+jID+": "+result+" lo comunico al Master" );
+			 System.out.println("W"+id+"->M app "+jID+": "+result);
 			 try {
 				master.finishJob(sc,jID,result,worker,id);
 			} catch (RemoteException e) {
@@ -50,10 +50,10 @@ public class Executer extends Thread{
 		}
 		else{
 			ServerProgram app = (ServerProgram) j;
-			System.out.println("Worker "+id+": Sto procedendo ad eseguire l'app Server "+app.getId());
+			System.out.println("W"+id+" start ServerApp execution ....");
 			 Object result = app.run(parameters);
 			 int jID = app.getId();
-			 System.out.println("Worker "+id+" ho calcolato l'app "+jID+": "+result+" lo comunico al Master" );
+			 System.out.println("W"+id+"->M app "+jID+": "+result);
 			 try {
 				master.finishJob(sc,jID,result,worker,id);
 			} catch (RemoteException e) {

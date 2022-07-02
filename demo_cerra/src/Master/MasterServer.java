@@ -9,23 +9,33 @@ import Worker.WorkerServer;
 /**
  * Questa interfaccia contiene tutti i metodi che possono essere invocati da Remeto sia dal Client che dal Worker.
  *
- * @author Vincenzo
+ * @author VincenzoCerra
  *
  */
 
 public interface MasterServer extends Remote{
 	
 	/**
-	 * Metodo che viene utilizzato dal Client per richiedere al Master l'esecuzione di un'applicazione java
+	 * Metodo che viene utilizzato dal Client per richiedere al Master l'esecuzione di un'applicazione java Client
 	 * @param sc riferimento al client per la callback
 	 * @param j	applicazione Java da eseguire
 	 * @param parameters parametri di input dell'applicazione
 	 * @throws RemoteException
 	 */
-	public void startRequest(ServerCallback sc, ClientApp j, Object parameters) throws RemoteException;
+	public void execClientApp(ServerCallback sc, ClientApp j, Object parameters) throws RemoteException;
 	
 	/**
-	 * Metodo utilizzato dal Worker per comunicare al Master il risultato ottenuto dalla simulazione dell'applicazione
+	 * Metodo che viene utilizzato dal Client per richiedere al Master l'esecuzione di un'applicazione java Server
+	 * @param sc riferimento al client per la callback
+	 * @param programma id programma da eseguire
+	 * @param parameters parametri di input dell'applicazione
+	 * @throws RemoteException
+	 */
+	
+	public void execServerApp(ServerCallback sc, int programma, Object parameters) throws RemoteException;
+	
+	/**
+	 * Metodo utilizzato dal Worker per comunicare al Master il risultato ottenuto dall'esecuzione dell'applicazione
 	 * @param sc riferimento al client per la callback
 	 * @param idJob	id dell'applicazione eseguita
 	 * @param result risultato dell'applicazione eseguita
@@ -53,13 +63,10 @@ public interface MasterServer extends Remote{
 	public void disconnectWorker(WorkerServer w, int id) throws RemoteException;
 	
 	/**
-	 * Metodo che viene utilizzato dal Client per richiedere al Master l'esecuzione di un'applicazione java
-	 * @param sc riferimento al client per la callback
-	 * @param j	applicazione Java da eseguire
-	 * @param parameters parametri di input dell'applicazione
+	 * Metodo che serve ai Clients per consocere le applicazioni java che il Master espone.
+	 * @return id dei servizi disponibili
 	 * @throws RemoteException
 	 */
-	public void startRequest2(ServerCallback sc, int programma, Object parameters) throws RemoteException;
 	
-	public String service()throws RemoteException;
+	public String getService()throws RemoteException;
 }

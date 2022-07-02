@@ -2,7 +2,6 @@ package Master;
 import Client.ClientApp;
 import Client.ServerCallback;
 
-
 /**
  * Classe di servizio utilizzata solo dal MasterServer per poter memorizzare in un'unica istanza tutte le informazioni 
  * relative ad una richiesta di esecuzione ricevuta dal client. Nello specifico contiene il riferimento al Client che ha richiesto l'esecuzione, 
@@ -13,8 +12,6 @@ import Client.ServerCallback;
  */
 public class ExecInfo {
 	
-	
-
 	public ServerCallback sc;
 	public Object j;
 	public Object parameters;
@@ -43,7 +40,7 @@ public class ExecInfo {
 		this.sc = sc;
 	}
 	/**
-	 * Metodo di servizio per ottenere l'applicazione associata all'oggetto
+	 * Metodo di servizio per ottenere l'Object "applicazione" associata all'oggetto
 	 * @return	applicazione Java
 	 */
 
@@ -51,7 +48,7 @@ public class ExecInfo {
 		return j;
 	}
 	/**
-	 * Metodo di servizio per la motidica dell'applicazione
+	 * Metodo di servizio per la motidica dell' Object applicazione
 	 * @param j
 	 */
 
@@ -60,7 +57,7 @@ public class ExecInfo {
 	}
 	
 	/**
-	 * Metodo di servizio per ottenere i paramentri dell'oggetto
+	 * Metodo di servizio per ottenere i paramentri associati all'oggetto
 	 * @param parameters parametri dell'oggetto
 	 */
 
@@ -70,7 +67,7 @@ public class ExecInfo {
 	
 	/**
 	 * Metodo di servizio per la motidica dei paramentri
-	 * @param parameters
+	 * @param parameters parametri dell'oggetto
 	 */
 
 	public void setParameters(Object parameters) {
@@ -85,6 +82,11 @@ public class ExecInfo {
 	public String toString() {
 		return "ExecInfo [Client=" + sc + ", App=" + j + ", parameters=" + parameters + "]";
 	}
+	
+	/**
+	 * Metodo che restitusce il tipo di oggetto: 0 -> ClientApp 1 -> ServerApp
+	 * @return
+	 */
 	
 	public int getType() {
 		return t;

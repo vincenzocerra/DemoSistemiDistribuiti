@@ -13,7 +13,7 @@ import Master.MasterServer;
 
 /**
  * Questa Classe gestisce la creazione del Worker, la connessione con il Master 
- * e la corretta esecuzione dell'applicazione JAVA Client comunicatagli dal Master. Implementa l'interfaccia WorkerServer
+ * e la corretta esecuzione dell'applicazione JAVA comunicatagli dal Master. Implementa l'interfaccia WorkerServer
  * definendo nel dettaglio le specifiche dei metodi accessibili da remoto.
  * @author VincenzoCerra
  *
@@ -60,7 +60,7 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 	
 	/**
 	* Metodo privato utilizzato per migliorare l'esperienza utente. Viene invocato solo nel caso di esecuzione singola del Worker
-	* e consente di disconnettere il worker in maniera controllata anche durante l'esecuzione di un'applicazione. Tale dinamicità è possibile
+	* e consente di disconnettere il worker in maniera controllata o non controllata anche durante l'esecuzione di un'applicazione. Tale dinamicità è possibile
 	* grazie ad un'implementazione non bloccante dei metodi.
 	*/
 	private void startConsole() {
@@ -90,16 +90,15 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 	}
 	
 	/**
-	 * Implementazione del metodo dell'interfaccia che nello specifico delega tutta l'esecuzione del programma java ad un Thread
+	 * Implementazione del metodo dell'interfaccia che si occupa della esecuzione del programma ricevuto. Il tutto avviene attraverso
+	 * la delega ad un Thread esecutore
 	 */
-	
-	public void start(ServerCallback sc, Object j, Object parameters, int type) throws RemoteException {
-		
+	public void execute(ServerCallback sc, Object j, Object parameters, int type) throws RemoteException {
+		System.out.println("M->W"+id+" execute java App");
 		Executer executer = new Executer( sc, j, parameters,master,this,id, type);
 		executer.start();
 		 
 	}
-	
 	
 	public static void main(String[] args) throws IOException, NotBoundException {
 		 BufferedReader br = new BufferedReader(new InputStreamReader(System.in));

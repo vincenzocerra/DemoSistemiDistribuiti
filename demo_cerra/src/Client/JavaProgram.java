@@ -3,7 +3,7 @@ package Client;
 /**
  * Classe che implementa l'interfaccia Job ed è pensata per simulare una generica applicazione java che il client vuole far eseguire al master
  * La durata dell'esecuzione dell'applicazione è simulata tramite una Thread.sleep() che prende in ingresso un valore random tra 10 secondi e 1 minuto
- * Per semplicità implementativa restituisce come risultato la durata del programma.
+ * Per semplicità implementativa restituisce come risultato la durata del programma e non considerando i parametri di ingresso.
  * 
  * @author VincenzoCerra
  *
@@ -31,7 +31,7 @@ public class JavaProgram implements ClientApp {
 			e.printStackTrace();
 		}
 		
-		return (durataProgramma);
+		return ("risultato ClientAPP0 "+durataProgramma);
 	}
 
 	@Override

@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.Semaphore;
-
 import Client.ClientApp;
 import Client.ServerCallback;
 import Worker.WorkerServer;
@@ -26,7 +24,7 @@ import Worker.WorkerServer;
  * Questa Classe gestisce la creazione del Master, la connessione con i Client e con i worker, 
  * l'assegnamento dell'esecuzione delle applicazioni ai worker e la comunicazione dei risultati ai client.
  * Implementa l'interfaccia MasterServer definendo nel dettaglio le specifiche dei metodi accessibili da remoto.
- * @author Vincenzo
+ * @author VincenzoCerra
  *
  */
 
@@ -35,26 +33,28 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	BlockingQueue <WorkerServer>availableWorkers2;
 	List<WorkerServer> workers;
 	Map<WorkerServer, ExecInfo> inEsecuzione;
-
-	
 	LinkedList<ServerProgram> serverProg;
 	private Registry registry;
 	private String lineString;
-
+	
+	/**
+	 * 
+	 * @param port
+	 * @throws RemoteException
+	 */
 
 	public MasterImp(int port) throws RemoteException {
 		super();
 		System.out.println("Avvio Master");		
-		//aggiorno le informazioni di registro
+		
+		registry = LocateRegistry.createRegistry(port);
+		registry.rebind("master", this);
 		
 		serverProg = new LinkedList<ServerProgram>();
 		serverProg.add(new ServerJavaProgram0());
 		serverProg.add(new ServerJavaProgram1());
 		serverProg.add(new ServerJavaProgram2());
 
-		
-		registry = LocateRegistry.createRegistry(port);
-		registry.rebind("master", this);
 		workers  = Collections.synchronizedList(new LinkedList<WorkerServer>());
 		availableWorkers2 = new LinkedBlockingQueue<WorkerServer>(2048);
 		inEsecuzione = Collections.synchronizedMap(new HashMap<WorkerServer,ExecInfo>());
@@ -64,8 +64,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 			System.out.println("Il Master è in esecuzione su " + addressString + ", port: " + port);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
-		}
-		
+		}	
 	}
 	
 	/**
@@ -128,10 +127,8 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 			ExecInfo info = inEsecuzione.get(w);
 			inEsecuzione.remove(w);
 			MasterThread gestoreTurno = new MasterThread(info,this);
-			gestoreTurno.start();
-			
-		}
-		
+			gestoreTurno.start();		
+		}	
 	}
 	
 	/**
@@ -177,15 +174,13 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	
 	/**
 	 * Implementazione del metodo presente nell'interfaccia. Tale metodo viene utilizzato dai client per richiedere una
-	 * nuova richiesta di esecuzione di un'applicazione. Tale metodo delegherà ogni richiesta ricevuta ad un nuovo MasterThread
+	 * nuova richiesta di esecuzione di un'applicazione Client. Tale metodo delegherà ogni richiesta ricevuta ad un nuovo MasterThread
 	 * che procederà a gestirla.
 	 */
 
 	@Override
-	public void startRequest(ServerCallback sc, ClientApp j, Object parameters) throws RemoteException {
-		//System.out.println("Master: ho ricevuto la richiesta di esecuzione dell'app "+j.getId()+" dal Client "+sc.getId());		
-		// qui tutto deve essere preso in carico da un thread 
-		// che verifichi che ci sia il worker disponibile, accodi le richieste e che avvii il medoto start di w 
+	public void execClientApp(ServerCallback sc, ClientApp j, Object parameters) throws RemoteException {
+		System.out.println("C"+sc.getId()+"->M exec app Client "+j.getId());
 		Object app = j;
 		int type = 0;
 		ExecInfo info = new ExecInfo(sc,app,parameters,type);
@@ -194,9 +189,15 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 
 	}
 	
+	/**
+	 * Implementazione del metodo presente nell'interfaccia. Tale metodo viene utilizzato dai client per richiedere una
+	 * nuova richiesta di esecuzione di un'applicazione Server. Tale metodo delegherà ogni richiesta ricevuta ad un nuovo MasterThread
+	 * che procederà a gestirla.
+	 */
+	
 	@Override
-	public void startRequest2(ServerCallback sc, int programma, Object parameters) throws RemoteException {
-		System.out.println("Master: ho ricevuto la richiesta di esecuzione dell'app Server "+programma+" dal Client "+sc.getId());		
+	public void execServerApp(ServerCallback sc, int programma, Object parameters) throws RemoteException {
+		System.out.println("C"+sc.getId()+"->M exec app Server "+programma);		
 		if (programma <0 || programma > serverProg.size()-1)sc.getResult(programma,"Programma non esistente");
 		else{
 			Object app = serverProg.get(programma);
@@ -212,6 +213,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	 * Metodo presente nell'interfaccia che può essere invocato da un Worker per comunicare la risoluzione dell'applicazione assegnata.
 	 * L'implementazione prevede che il Master, una volta ottenuti i risultati, procederà ad invocare la callback sul client inoltrando i risultati.
 	 */
+	
 	@Override
 	public void finishJob(ServerCallback sc,int iDJob, Object result, WorkerServer w, int wID) throws RemoteException {
 		inEsecuzione.remove(w);
@@ -221,8 +223,22 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//System.out.println("Master: Il worker "+wID+" mi ha comunicato il risultato dell'app "+iDJob+": "+result+", lo inoltro al client "+sc.getId());
+		System.out.println("W"+wID+"->M: app "+iDJob+": "+result);
+		System.out.println("M->C"+sc.getId()+": app "+iDJob+": "+result);
 		sc.getResult(iDJob,result);		
+	}
+	
+	 /**
+	  * Implementazione del metodo presente nell'interfaccia che permette ai Client di chiedere quali sono le applicazioni server disponibili.
+	  */
+	 
+	@Override
+	public String getService() throws RemoteException {
+		String services ="| ";
+		for (ServerProgram sp : serverProg) {
+			services+= sp.getId()+ " | ";
+		}
+		return services;
 	}
 	
 	 public static void main(String[] args) throws IOException {
@@ -248,14 +264,6 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 				}
 			}// while	 
 	 }
-	@Override
-	public String service() throws RemoteException {
-		String services ="";
-		for (ServerProgram sp : serverProg) {
-			services+= sp.getId()+ " - ";
-		}
-		return services;
-	}
 	
 
 }

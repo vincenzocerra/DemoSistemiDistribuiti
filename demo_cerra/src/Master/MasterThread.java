@@ -1,7 +1,6 @@
 package Master;
 
 import java.util.concurrent.BlockingQueue;
-
 import Client.ServerCallback;
 import Worker.WorkerServer;
 
@@ -33,7 +32,9 @@ public class MasterThread extends Thread {
 	}
 	
 	/**
-	 * 
+	 * Il metodo utilizza la lista availableWorker mettendo in attesa del proprio turno attraverso
+	 * l'istruzione take(). Tale ascolto non è un busy waiting in quanto non viene utilizzata la cpu,
+	 * il thread infatti è "addormentato" e verrà svegliato direttamente dalla lista quando sarà il suo turno.
 	 */
 	
 	public void run()	{	
@@ -41,13 +42,12 @@ public class MasterThread extends Thread {
 			w =availableWorker.take();
 			master.inEsecuzione.put(w, info);
 			try {
-			System.out.println("Master: assegno l'esecuzione dell'app al worker "+w.getId());
-			w.start(client, j, parameters, info.getType());
+			System.out.println("M->W"+w.getId()+" execution task ");
+			w.execute(client, j, parameters, info.getType());
 			}catch(Exception e){
 				master.handleBadDisconnection(w);
 			}
 			} catch (Exception e) {
-				e.printStackTrace();
 			}
 	}
 }
