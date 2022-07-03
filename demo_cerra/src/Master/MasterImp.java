@@ -32,9 +32,9 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	
 	BlockingQueue <WorkerServer>availableWorkers2;
 	List<WorkerServer> workers;
-	Map<WorkerServer, ExecInfo> inEsecuzione;
-	Map<WorkerServer, Thread> scanner;
-	LinkedList<ServerProgram> serverProg;
+	volatile Map<WorkerServer, ExecInfo> inEsecuzione;
+	volatile Map<WorkerServer, Thread> scanner;
+	volatile LinkedList<ServerProgram> serverProg;
 	private Registry registry;
 	private String lineString;
 	private int id=0;
@@ -65,7 +65,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 
 		try {
 			String addressString = (InetAddress.getLocalHost()).toString();
-			System.out.println("Il Master è in esecuzione su " + addressString + ", port: " + port);
+			System.out.println("Il Master e' in esecuzione su " + addressString + ", port: " + port);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}	
@@ -127,7 +127,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		availableWorkers2.remove(w);
 		workers.remove(w);
 		if(inEsecuzione.containsKey(w)) {
-			System.out.println("Master: Avvio procedura riassegnazione applicazione Worker ");
+			System.out.println("M"+id+": Avvio procedura riassegnazione applicazione Worker ");
 			ExecInfo info = inEsecuzione.get(w);
 			inEsecuzione.remove(w);
 			try {
@@ -174,9 +174,9 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		availableWorkers2.remove(w);
 		scanner.get(w).interrupt();
 		System.out.println("M"+id+": W"+id+ " Disconnesso!");
-		System.out.println("Master: Attualmente sono disponibili: " + workers.size()+ " Worker");
+		System.out.println("M"+id+": Attualmente sono disponibili: " + workers.size()+ " Worker");
 		if(inEsecuzione.containsKey(w)) {
-			System.out.println("Master: Avvio procedura riassegnazione applicazione Worker ");
+			System.out.println("M"+id+": Avvio procedura riassegnazione applicazione Worker ");
 			ExecInfo info = inEsecuzione.get(w);
 			inEsecuzione.remove(w);
 			MasterThread gestoreTurno = new MasterThread(info,this);
@@ -193,7 +193,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 
 	@Override
 	public void execClientApp(ServerCallback sc, ClientApp j, Object parameters) throws RemoteException {
-		System.out.println("C"+sc.getId()+"->M exec app Client "+j.getId());
+		System.out.println("C"+sc.getId()+"->M"+id+" exec app Client "+j.getId());
 		Object app = j;
 		int type = 0;
 		ExecInfo info = new ExecInfo(sc,app,parameters,type);
@@ -237,7 +237,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 			e.printStackTrace();
 		}
 		try {
-		System.out.println("M->C"+sc.getId()+": app "+iDJob+": "+result);
+		System.out.println("M"+id+"->C"+sc.getId()+": app "+iDJob+": "+result);
 		sc.getResult(iDJob,result);
 		}catch(Exception e) {
 			System.out.println("Client non disponibile");

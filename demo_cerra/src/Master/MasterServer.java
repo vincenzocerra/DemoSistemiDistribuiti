@@ -7,7 +7,7 @@ import Client.ServerCallback;
 import Worker.WorkerServer;
 
 /**
- * Questa interfaccia contiene tutti i metodi che possono essere invocati da Remeto sia dal Client che dal Worker.
+ * Questa interfaccia contiene tutti i metodi che possono essere invocati da Remoto sia dal Client che dal Worker.
  *
  * @author VincenzoCerra
  *

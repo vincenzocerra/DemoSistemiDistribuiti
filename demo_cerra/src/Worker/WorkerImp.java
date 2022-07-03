@@ -167,7 +167,7 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 	@Override
 	public void setId(int id) throws RemoteException {
 		this.id=id;
-		System.out.println("W"+id+" new id");
+		System.out.println("ID assegnato->"+id);
 	}
 	
 	 

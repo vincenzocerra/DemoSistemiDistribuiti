@@ -17,13 +17,13 @@ public interface WorkerServer extends Remote {
 	 * @param j riferimento all'applicazione java
 	 * @param parameters paramentri dell'applicazione
 	 * @param type indica la tipologia dell'applicazione (Server o Client)
-	 * @throws RemoteException remote exception
+	 * @throws RemoteException Se generata indica che c è un problema di connessione
 	 */
     void execute(ServerCallback sc, Object j, Object parameters,int type) throws RemoteException;
     /**
      * Metodo utilizzato per ottenere l'id del worker
      * @return id del worker
-     * @throws RemoteException remote exception
+     * @throws RemoteException Se generata indica che c è un problema di connessione
      */
     
     int getId()throws RemoteException;
@@ -33,6 +33,12 @@ public interface WorkerServer extends Remote {
      * @throws RemoteException Se generata indica che c è un problema di connessione con il Worker
      */
     boolean isOn()throws RemoteException;
+    
+    /**
+     * Metodo utilizzato per settare l'id del Worker a piacimento del Master
+     * @param id nuovo id
+     * @throws RemoteException Se generata indica che c è un problema di connessione con il Worker
+     */
     
     void setId(int id)throws RemoteException;
 }

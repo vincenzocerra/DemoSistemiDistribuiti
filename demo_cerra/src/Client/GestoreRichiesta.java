@@ -5,7 +5,7 @@ import Master.MasterServer;
 
 /**
  * Questa classe si occupa della creazione di un Thread lato Client. Ogni Thread ha il compito di invocare 
- * la funzione execClientApp/execServerApp presenti nell'interfaccia del master
+ * la funzione execClientApp/execServerApp presente nell'interfaccia del Master
  * @author VincenzoCerra
  *
  */

@@ -8,7 +8,7 @@ import Master.ServerProgram;
 
 /**
  * Questa classe si occupa della creazione di un Thread lato Worker. Ogni Thread ha il compito di invocare il metodo
- * run dell'applicazione per esegurla seppure non conosce la sua reale implementazione.
+ * run dell'applicazione per eseguirla seppure non conosca la sua reale implementazione.
  * Una volta ottenuto il risultato, lo comunica al master invocando il metodo finishJob
  * @author VincenzoCerra
  *

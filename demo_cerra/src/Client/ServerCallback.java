@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 /**
  * Questa interfaccia è stata pensata per evitare che un Client rimanga bloccato in attesa di una risposta
  * da parte del MASTER. Tramite l'utilizzo di queste callback esso verrà direttamente ricontattato quando il risultato
- * è stato calcolato o il server 
+ * è stato calcolato o il server deve notificargli qualcosa.
  * 
  * @author VincenzoCerra
  *
