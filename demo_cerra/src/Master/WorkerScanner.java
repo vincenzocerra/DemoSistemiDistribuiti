@@ -33,6 +33,7 @@ public class WorkerScanner extends Thread {
 				System.out.println("Master: Il Worker "+wId+" ha improvvisamente smesso di funzionare");
 				try {
 					m.handleBadDisconnection(w);
+					m.scanner.remove(w);
 					online=false;
 				} catch (RemoteException e1) {
 					// TODO Auto-generated catch block
@@ -43,8 +44,7 @@ public class WorkerScanner extends Thread {
 			try {
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				online=false;
 			}
 		}
 		

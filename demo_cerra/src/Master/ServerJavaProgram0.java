@@ -17,16 +17,14 @@ public class ServerJavaProgram0 implements ServerProgram{
 	int durataProgramma;
 
 	public ServerJavaProgram0() {
-		durataProgramma=(int)(Math.random() * (maxDuration - minDuration) + minDuration);
 	}
 	
 	@Override
 	public Object run(Object parameters) {
-		
+		durataProgramma=(int)(Math.random() * (maxDuration - minDuration) + minDuration);
 		try {
 			Thread.sleep(durataProgramma);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 		
 		return ("risultato ServerAPP "+durataProgramma);

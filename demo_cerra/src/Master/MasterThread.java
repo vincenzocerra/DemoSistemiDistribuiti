@@ -42,7 +42,7 @@ public class MasterThread extends Thread {
 			w =availableWorker.take();
 			master.inEsecuzione.put(w, info);
 			try {
-			System.out.println("M->W"+w.getId()+" execution task ");
+			System.out.println("M->W"+w.getId()+" execute app ");
 			w.execute(client, j, parameters, info.getType());
 			}catch(Exception e){
 				master.handleBadDisconnection(w);

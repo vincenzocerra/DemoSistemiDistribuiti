@@ -28,7 +28,6 @@ public class JavaProgram implements ClientApp {
 		try {
 			Thread.sleep(durataProgramma);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 		
 		return ("risultato ClientAPP0 "+durataProgramma);

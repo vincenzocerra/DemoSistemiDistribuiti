@@ -43,8 +43,9 @@ public class GestoreRichiesta extends Thread {
 				master.execServerApp(client,service,"parameters");
 				System.out.println("C"+client.id+"->M request Server APP "+service);
 			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.out.println("Il Master non e' piu' disponibile");
+				System.exit(-1);
+
 			}
 		}
 		else {
@@ -53,7 +54,8 @@ public class GestoreRichiesta extends Thread {
 				master.execClientApp(client,job,"parameters");
 				System.out.println("C"+client.id+"->M request Client APP "+job.id);
 			} catch (RemoteException e) {
-				e.printStackTrace();
+				System.out.println("Il Master non e' piu' disponibile");
+				System.exit(-1);
 			}	
 		}
 	}

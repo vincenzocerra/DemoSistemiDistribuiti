@@ -11,22 +11,20 @@ package Master;
 public class ServerJavaProgram1 implements ServerProgram{
 
 	private static final long serialVersionUID = 1L;
-	int id = 0;
+	int id = 1;
 	private int maxDuration= 40000;
 	private int minDuration= 20000;
 	int durataProgramma;
 
 	public ServerJavaProgram1() {
-		durataProgramma=(int)(Math.random() * (maxDuration - minDuration) + minDuration);
 	}
 	
 	@Override
 	public Object run(Object parameters) {
-		
+		durataProgramma=(int)(Math.random() * (maxDuration - minDuration) + minDuration);
 		try {
 			Thread.sleep(durataProgramma);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 		
 		return ("risultato ServerAPP1 "+durataProgramma);

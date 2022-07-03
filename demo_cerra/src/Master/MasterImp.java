@@ -33,9 +33,11 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	BlockingQueue <WorkerServer>availableWorkers2;
 	List<WorkerServer> workers;
 	Map<WorkerServer, ExecInfo> inEsecuzione;
+	Map<WorkerServer, Thread> scanner;
 	LinkedList<ServerProgram> serverProg;
 	private Registry registry;
 	private String lineString;
+	private int id=0;
 	
 	/**
 	 * 
@@ -58,7 +60,8 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		workers  = Collections.synchronizedList(new LinkedList<WorkerServer>());
 		availableWorkers2 = new LinkedBlockingQueue<WorkerServer>(2048);
 		inEsecuzione = Collections.synchronizedMap(new HashMap<WorkerServer,ExecInfo>());
-				
+		scanner = Collections.synchronizedMap(new HashMap<WorkerServer,Thread>());
+
 		try {
 			String addressString = (InetAddress.getLocalHost()).toString();
 			System.out.println("Il Master è in esecuzione su " + addressString + ", port: " + port);
@@ -126,6 +129,11 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 			System.out.println("Master: Avvio procedura riassegnazione applicazione Worker ");
 			ExecInfo info = inEsecuzione.get(w);
 			inEsecuzione.remove(w);
+			try {
+			info.getSc().notifyInfo("Internal Problem, reprocessing your request");
+			}catch(RemoteException e) {
+				System.out.println("Client non disponibile");
+			}
 			MasterThread gestoreTurno = new MasterThread(info,this);
 			gestoreTurno.start();		
 		}	
@@ -140,6 +148,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	@Override
 	public void connectWorker(WorkerServer w, int id) throws RemoteException {
 		WorkerScanner ws= new WorkerScanner(w,id,this);
+		scanner.put(w, ws);
 		ws.start();
 		workers.add(w);
 		try {
@@ -160,7 +169,8 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	public void disconnectWorker(WorkerServer w,int id) throws RemoteException {
 		workers.remove(w);
 		availableWorkers2.remove(w);
-		System.out.println("Master: Worker " +id+ " Disconnesso!");
+		scanner.get(w).interrupt();
+		System.out.println("M"+id+": W"+id+ " Disconnesso!");
 		System.out.println("Master: Attualmente sono disponibili: " + workers.size()+ " Worker");
 		if(inEsecuzione.containsKey(w)) {
 			System.out.println("Master: Avvio procedura riassegnazione applicazione Worker ");
@@ -197,7 +207,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	
 	@Override
 	public void execServerApp(ServerCallback sc, int programma, Object parameters) throws RemoteException {
-		System.out.println("C"+sc.getId()+"->M exec app Server "+programma);		
+		System.out.println("C"+sc.getId()+"->M"+id+" exec app Server "+programma);		
 		if (programma <0 || programma > serverProg.size()-1)sc.getResult(programma,"Programma non esistente");
 		else{
 			Object app = serverProg.get(programma);
@@ -223,9 +233,12 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("W"+wID+"->M: app "+iDJob+": "+result);
+		try {
 		System.out.println("M->C"+sc.getId()+": app "+iDJob+": "+result);
-		sc.getResult(iDJob,result);		
+		sc.getResult(iDJob,result);
+		}catch(Exception e) {
+			System.out.println("Client non disponibile");
+		}
 	}
 	
 	 /**
@@ -241,13 +254,52 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 		return services;
 	}
 	
+	public void setId(int id) {
+		this.id=id;
+	}
+	
 	 public static void main(String[] args) throws IOException {
 		
 		 BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		 boolean ok = false;
 		 int port = 6000;
+		 int scelta= 0;
+		 int masters=1;
 		 while (ok != true) {
-			 System.out.println("Inserire la porta del master");
+			 System.out.println("Esecuzione Singola da Terminale (1) o Esecuzione Multipla (2)");
+			 try {
+					scelta = Integer.parseInt(br.readLine());
+				}catch(NumberFormatException e) {
+					System.out.println("Bisogna inserire un numero tra 1 e 2 !");
+					continue;
+				}
+			 if(scelta != 1 && scelta !=2)continue;
+			 else {
+				 ok = true; 
+			 }
+		 }
+		 ok=false;
+		 while (ok != true) {
+		 if(scelta ==2) {
+			 System.out.println("Inserire il numero di Master da connettere");
+		 try {
+				masters = Integer.parseInt(br.readLine());
+			}catch(NumberFormatException e) {
+				System.out.println("Bisogna inserire un numero tra 2 e n !");
+				continue;
+			}
+		 	if( masters<2 ) {
+		 		System.out.println("Bisogna inserire un numero maggiore di 2");
+		 		continue;
+		 	}
+		 	else {
+		 		ok=true;
+		 	}
+		 }
+		 for(int i = 0; i< masters; i++) {
+		 ok=false;
+		 while (ok != true) {
+			 System.out.println("Inserire la porta del Master "+i);
 			 try {
 					port = Integer.parseInt(br.readLine());
 				}catch(NumberFormatException e) {
@@ -257,12 +309,15 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 			 ok = true;
 			 try {
 					MasterImp mi= new MasterImp(port);
-					mi.startConsole();
+					mi.setId(i);
+					if(scelta==1)mi.startConsole();
 				} catch (RemoteException e) {
 					System.out.println("Porta in uso da un altro Master");
 					ok =false;
 				}
 			}// while	 
+		 }
+		}
 	 }
 	
 

@@ -136,7 +136,12 @@ public class Client implements ServerCallback {
 					System.out.println("Client disconnesso!");
 				}
 				else if(line.equals("s") && line != null) {
+					try {
 					System.out.println(master.getService());
+					}catch(Exception e) {
+						System.out.println("Il Master non e' piu' disponibile");
+						System.exit(-1);
+					}
 				}
 				else if(line.equals("r") && line != null) {
 					GestoreRichiesta gestore = new GestoreRichiesta(this,master);

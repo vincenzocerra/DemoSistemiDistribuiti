@@ -29,6 +29,7 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 	private MasterServer master;
 	private boolean running = true;
 	int id;
+	private Executer executer;
 	
 	/**
 	 * Costruttore di un Worker
@@ -73,7 +74,14 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 			try {
 				line = bReader.readLine();
 				if(line.equals("q") && line != null) {
+					try {
+						executer.interrupt();
+					}catch(Exception e) {};
+					try {
 					master.disconnectWorker(this,id);
+					}catch(RemoteException e) {
+						System.out.println("il Master non e' piu' disponibile");
+					}
 					running = false;
 					bReader.close();
 					System.out.println("Worker"+id+" disconnesso!");
@@ -95,7 +103,7 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 	 */
 	public void execute(ServerCallback sc, Object j, Object parameters, int type) throws RemoteException {
 		System.out.println("M->W"+id+" execute java App");
-		Executer executer = new Executer( sc, j, parameters,master,this,id, type);
+		executer = new Executer( sc, j, parameters,master,this,id, type);
 		executer.start();
 		 
 	}

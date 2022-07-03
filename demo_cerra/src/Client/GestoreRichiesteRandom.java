@@ -42,13 +42,8 @@ public class GestoreRichiesteRandom extends Thread {
 					master.execClientApp(c,job,"parameters");
 					System.out.println("C"+c.id+"->M request Client APP "+job.getId());
 				} catch (RemoteException e) {
-					e.printStackTrace();
-				}
-				try {
-					int timeForNewRequest=(int)(Math.random() * (maxSleep - minSleep) + minSleep);
-					Thread.sleep(timeForNewRequest);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+					System.out.println("Il Master non e' piu' disponibile");
+					System.exit(-1);
 				}
 			}
 			else {
@@ -57,12 +52,20 @@ public class GestoreRichiesteRandom extends Thread {
 					master.execServerApp(c,service,"parameters");
 					System.out.println("C"+c.id+"->M request Server APP "+service);
 				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					System.out.println("Il Master non e' piu' disponibile");
+					System.exit(-1);
 				}
 			}
 			counter++;
 			if(counter == richiesteCount)check=false;
+			else {
+				try {
+					int timeForNewRequest=(int)(Math.random() * (maxSleep - minSleep) + minSleep);
+					Thread.sleep(timeForNewRequest);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		
 	}
