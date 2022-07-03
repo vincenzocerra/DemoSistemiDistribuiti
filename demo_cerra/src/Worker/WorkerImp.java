@@ -29,6 +29,7 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 	private MasterServer master;
 	private boolean running = true;
 	int id;
+	int port;
 	private Executer executer;
 	
 	/**
@@ -43,6 +44,7 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 	public WorkerImp(String host, int port, int id) throws RemoteException, NotBoundException {
 		super();
 		this.id = id;
+		this.port=port;
 		
 		System.out.println("Worker "+id+": Sto cercando di connettermi al server: " + host + " port: " + port);
 		
@@ -74,9 +76,6 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 			try {
 				line = bReader.readLine();
 				if(line.equals("q") && line != null) {
-					try {
-						executer.interrupt();
-					}catch(Exception e) {};
 					try {
 					master.disconnectWorker(this,id);
 					}catch(RemoteException e) {
@@ -164,4 +163,14 @@ public class WorkerImp extends UnicastRemoteObject implements WorkerServer{
 	public int getId() throws RemoteException {
 		return id;
 	}
+	
+	@Override
+	public void setId(int id) throws RemoteException {
+		this.id=id;
+		System.out.println("W"+id+" new id");
+	}
+	
+	 
+	
+	
 }

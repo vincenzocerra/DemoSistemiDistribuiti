@@ -38,6 +38,7 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	private Registry registry;
 	private String lineString;
 	private int id=0;
+	volatile int wCount=0;
 	
 	/**
 	 * 
@@ -146,8 +147,9 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 	 */
 	
 	@Override
-	public void connectWorker(WorkerServer w, int id) throws RemoteException {
-		WorkerScanner ws= new WorkerScanner(w,id,this);
+	public synchronized void connectWorker(WorkerServer w, int id) throws RemoteException {
+		w.setId(wCount);
+		WorkerScanner ws= new WorkerScanner(w,wCount,this);
 		scanner.put(w, ws);
 		ws.start();
 		workers.add(w);
@@ -157,7 +159,8 @@ public class MasterImp extends UnicastRemoteObject implements MasterServer{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("Master: Worker " +id+ " connesso!");
+		System.out.println("Master: Worker " +wCount+ " connesso!");
+		wCount++;
 	}
 	
 	/**

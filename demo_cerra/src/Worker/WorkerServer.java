@@ -33,4 +33,6 @@ public interface WorkerServer extends Remote {
      * @throws RemoteException Se generata indica che c è un problema di connessione con il Worker
      */
     boolean isOn()throws RemoteException;
+    
+    void setId(int id)throws RemoteException;
 }
